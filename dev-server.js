@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const apiHandler = require('./api/index');
-const orderSummaryService = require('./order-summary-service');
+const orderSummaryService = require('./api/order-summary-service');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = __dirname;

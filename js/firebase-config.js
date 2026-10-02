@@ -4,10 +4,6 @@
 // Paste your Firebase Web App configuration below:
 // (Get it free in 2 minutes from https://console.firebase.google.com)
 
-if (typeof window === 'undefined') {
-  module.exports = {};
-  return;
-}
 
 window.FIREBASE_CONFIG = {
   apiKey: "YOUR_FIREBASE_API_KEY",

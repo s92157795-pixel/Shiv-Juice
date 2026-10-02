@@ -4,53 +4,6 @@
  * Smooth Fade-Out & Disappearance for Hero Welcome Line & Girl Shake Image on Scroll
  */
 
-// Serverless runtime guard for Node.js / Vercel
-if (typeof window === 'undefined' || typeof document === 'undefined') {
-  const fs = require('fs');
-  const path = require('path');
-
-  const MIME_TYPES = {
-    '.html': 'text/html; charset=UTF-8',
-    '.css': 'text/css; charset=UTF-8',
-    '.js': 'application/javascript; charset=UTF-8',
-    '.json': 'application/json; charset=UTF-8',
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.webp': 'image/webp'
-  };
-
-  module.exports = (req, res) => {
-    let reqPath = decodeURI((req.url || '').split('?')[0]);
-
-    if (reqPath === '/app.js') {
-      res.writeHead(200, { 'Content-Type': 'application/javascript; charset=UTF-8' });
-      res.end(fs.readFileSync(__filename));
-      return;
-    }
-
-    if (reqPath === '/' || reqPath === '/index.html' || !reqPath) {
-      const htmlPath = path.join(__dirname, 'index.html');
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-      res.end(fs.readFileSync(htmlPath));
-      return;
-    }
-
-    const filePath = path.join(__dirname, reqPath);
-    if (fs.existsSync(filePath)) {
-      const ext = path.extname(filePath).toLowerCase();
-      const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(fs.readFileSync(filePath));
-      return;
-    }
-
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not found');
-  };
-  return;
-}
-
 (function () {
   'use strict';
 
