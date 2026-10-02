@@ -338,6 +338,39 @@
   </div>
 
 
+  <!-- ================================================================= -->
+  <!-- LOGOUT CONFIRMATION MODAL (Premium Glassmorphism Popup) -->
+  <!-- ================================================================= -->
+  <div id="logout-confirm-modal" class="fixed inset-0 z-[999999] hidden items-center justify-center p-4 transition-all duration-300">
+    <!-- Backdrop -->
+    <div id="logout-modal-backdrop" onclick="closeLogoutModal()" class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+    <!-- Modal Card -->
+    <div id="logout-modal-card" class="relative z-10 max-w-[380px] w-full rounded-3xl p-6 sm:p-7 bg-white/80 backdrop-blur-2xl border-2 border-primary/30 shadow-2xl flex flex-col gap-4 transform scale-90 opacity-0 transition-all duration-300">
+      <!-- Icon -->
+      <div class="flex justify-center">
+        <div class="w-16 h-16 rounded-full bg-red-50 border-2 border-red-200 flex items-center justify-center shadow-inner">
+          <span class="material-symbols-outlined text-red-500 text-4xl">logout</span>
+        </div>
+      </div>
+      <!-- Title -->
+      <div class="text-center">
+        <h3 class="text-lg font-bold text-primary tracking-tight">Sign Out?</h3>
+        <p class="text-[12px] text-on-surface-variant mt-1 leading-relaxed">Are you sure you want to sign out from <strong class="text-primary">Shiv Juice Center</strong>? You'll need to log in again to place orders.</p>
+      </div>
+      <!-- Action Buttons -->
+      <div class="flex gap-3 mt-1">
+        <button type="button" onclick="closeLogoutModal()" class="flex-1 py-2.5 rounded-full border-2 border-primary/30 bg-white hover:bg-primary/5 text-primary text-sm font-bold transition-all hover:scale-[1.02] active:scale-95">
+          Cancel
+        </button>
+        <button type="button" onclick="confirmLogout()" class="flex-1 py-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white text-sm font-bold shadow-md transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">logout</span>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- Pinned Fullscreen Background Canvas -->
   <div id="canvas-container">
     <canvas id="sequence-canvas"></canvas>
@@ -2179,16 +2212,12 @@
           localStorage.setItem('sjc_auth_user', JSON.stringify(data.user));
           checkLoginState();
         } else if (data.code === 'NO_ACCOUNT') {
-          showError(errorDiv, 'No account found for this number. Switching to Sign Up in 2 seconds...');
-          setTimeout(() => {
-            switchAuthTab('signup');
-            const supMob = document.getElementById('signup-mobile');
-            if (supMob) supMob.value = mobile;
-            const supName = document.getElementById('signup-name');
-            if (supName) supName.focus();
-          }, 1800);
+          showError(errorDiv, 'This mobile number is not registered yet. Please create an account first.');
+        } else if (data.code === 'WRONG_PASSWORD') {
+          showError(errorDiv, 'Incorrect password. Please check and try again.');
+          passwordInput?.select();
         } else {
-          showError(errorDiv, data.message || 'Incorrect password. Please try again.');
+          showError(errorDiv, data.message || 'Sign in failed. Please try again.');
           passwordInput?.select();
         }
       } catch (err) {
@@ -2486,11 +2515,60 @@
 
 
     function handleLogout() {
-      if (confirm('Are you sure you want to log out from Shiv Juice Center?')) {
-        localStorage.removeItem('sjc_auth_user');
-        sessionStorage.removeItem('sjc_auth_user');
-        checkLoginState();
-      }
+      openLogoutModal();
+    }
+
+    function openLogoutModal() {
+      const modal = document.getElementById('logout-confirm-modal');
+      const backdrop = document.getElementById('logout-modal-backdrop');
+      const card = document.getElementById('logout-modal-card');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      // Animate in
+      requestAnimationFrame(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        card.classList.remove('scale-90', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      });
+    }
+
+    function closeLogoutModal() {
+      const modal = document.getElementById('logout-confirm-modal');
+      const backdrop = document.getElementById('logout-modal-backdrop');
+      const card = document.getElementById('logout-modal-card');
+      if (!modal) return;
+      // Animate out
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-90', 'opacity-0');
+      setTimeout(() => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function confirmLogout() {
+      localStorage.removeItem('sjc_auth_user');
+      sessionStorage.removeItem('sjc_auth_user');
+      closeLogoutModal();
+      // Reset all signup steps to initial state
+      const step1 = document.getElementById('signup-step-1');
+      const step2 = document.getElementById('signup-step-2');
+      const step3 = document.getElementById('signup-step-3');
+      if (step1) step1.classList.remove('hidden');
+      if (step2) { step2.classList.add('hidden'); step2.classList.remove('flex'); }
+      if (step3) { step3.classList.add('hidden'); step3.classList.remove('flex'); }
+      // Clear input fields
+      ['signin-mobile','signin-password','signup-name','signup-mobile','signup-otp-input','signup-password','signup-password-confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      // Switch to Sign In tab and show gateway
+      switchAuthTab('signin');
+      checkLoginState();
     }
 
     // Call checkLoginState immediately on load
