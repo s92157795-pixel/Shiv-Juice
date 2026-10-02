@@ -4,6 +4,23 @@
  * Smooth Fade-Out & Disappearance for Hero Welcome Line & Girl Shake Image on Scroll
  */
 
+// Serverless runtime guard for Node.js / Vercel
+if (typeof window === 'undefined' || typeof document === 'undefined') {
+  const fs = require('fs');
+  const path = require('path');
+  module.exports = (req, res) => {
+    const htmlPath = path.join(__dirname, 'index.html');
+    if (fs.existsSync(htmlPath)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+      res.end(fs.readFileSync(htmlPath));
+    } else {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('Shiv Juice Center OK');
+    }
+  };
+  return;
+}
+
 (function () {
   'use strict';
 
