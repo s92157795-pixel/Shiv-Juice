@@ -36,7 +36,7 @@ loadEnv();
 
 let orderSummaryService = null;
 try {
-  orderSummaryService = require('./order-summary-service');
+  orderSummaryService = require('../lib/order-summary-service');
 } catch (e) {
   console.warn('[WARN] orderSummaryService could not be loaded:', e.message);
 }
