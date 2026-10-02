@@ -2231,6 +2231,32 @@
       }
 
       btn.disabled = true;
+      btnText.innerText = 'Checking...';
+
+      try {
+        // PRE-CHECK: Block signup if this number already has a registered account
+        const checkRes = await fetch('/api/check-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile })
+        });
+        const checkData = await checkRes.json();
+        if (checkData.success && checkData.hasPassword) {
+          showError(errorDiv, '⚠️ This mobile number is already registered! Redirecting to Sign In...');
+          btn.disabled = false;
+          btnText.innerText = 'Verify Mobile Number';
+          setTimeout(() => {
+            switchAuthTab('signin');
+            const signinMob = document.getElementById('signin-mobile');
+            if (signinMob) signinMob.value = mobile;
+            setTimeout(() => document.getElementById('signin-password')?.focus(), 100);
+          }, 2000);
+          return;
+        }
+      } catch (preCheckErr) {
+        console.warn('Pre-check user failed, proceeding to send OTP anyway:', preCheckErr);
+      }
+
       btnText.innerText = 'Sending SMS OTP...';
 
       try {
@@ -2430,6 +2456,14 @@
         if (data.success && data.user) {
           localStorage.setItem('sjc_auth_user', JSON.stringify(data.user));
           checkLoginState();
+        } else if (data.code === 'ALREADY_REGISTERED') {
+          showError(errorDiv, '⚠️ This number is already registered! Redirecting to Sign In...');
+          setTimeout(() => {
+            switchAuthTab('signin');
+            const signinMob = document.getElementById('signin-mobile');
+            if (signinMob) signinMob.value = mobile;
+            setTimeout(() => document.getElementById('signin-password')?.focus(), 100);
+          }, 2000);
         } else {
           showError(errorDiv, data.message || 'Could not save password. Please try again.');
         }

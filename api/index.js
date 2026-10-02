@@ -660,6 +660,17 @@ const requestHandler = (req, res) => {
           return res.end(JSON.stringify({ success: false, message: 'Password must be at least 6 characters long.' }));
         }
 
+        // DUPLICATE SIGNUP PREVENTION: Block if this mobile already has a password set
+        const existingProfile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        if (existingProfile && existingProfile.passwordHash) {
+          res.writeHead(409, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({
+            success: false,
+            code: 'ALREADY_REGISTERED',
+            message: 'This mobile number is already registered. Please Sign In with your password instead.'
+          }));
+        }
+
         const passwordHash = hashPassword(password);
         let updatedProfile = { mobile: cleanMobile, passwordHash };
         if (name && name.trim()) {
