@@ -1450,7 +1450,15 @@ const requestHandler = (req, res) => {
 };
 
 module.exports = (req, res) => {
-  return requestHandler(req, res);
+  try {
+    return requestHandler(req, res);
+  } catch (err) {
+    console.error('[API FATAL ERROR]', err);
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: err.message || 'Internal Server Error' }));
+    }
+  }
 };
 
 module.exports.config = {
@@ -1459,3 +1467,4 @@ module.exports.config = {
     externalResolver: true,
   },
 };
+
