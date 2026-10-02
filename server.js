@@ -259,7 +259,8 @@ const requestHandler = (req, res) => {
     return;
   }
 
-  let reqPath = decodeURI(req.url.split('?')[0]);
+  const rawUrl = (req.headers && (req.headers['x-matched-path'] || req.headers['x-forwarded-uri'])) || req.url || '/';
+  let reqPath = decodeURI(rawUrl.split('?')[0]);
 
   // ==========================================
   // FAST2SMS OTP API: Send OTP
@@ -1485,7 +1486,7 @@ const requestHandler = (req, res) => {
 
 const server = http.createServer(requestHandler);
 
-if (!process.env.VERCEL) {
+if (require.main === module && !process.env.VERCEL) {
   server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}/`);
     console.log(`Shop: ${SHOP_LOCATION}`);
