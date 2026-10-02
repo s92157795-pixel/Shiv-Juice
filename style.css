@@ -1,0 +1,58 @@
+/* Pinned Fullscreen Background Canvas */
+#canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: #f7ced8;
+}
+
+#sequence-canvas {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
+/* Hide scrollbars across all browsers */
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Pop-Up Pair Cards (Left and Right pieces) */
+.pop-card-left,
+.pop-card-right {
+  background: rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1.5px solid rgba(184, 16, 89, 0.45) !important;
+  box-shadow: 0 10px 32px rgba(120, 0, 38, 0.08) !important;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, border-color 0.25s ease;
+  will-change: opacity, transform;
+}
+
+.pop-card-left:hover,
+.pop-card-right:hover,
+.pop-card-left:focus-within,
+.pop-card-right:focus-within {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.38) !important;
+  border-color: rgba(184, 16, 89, 0.85) !important;
+  transform: translate(0, 0) scale(1.02) !important;
+}
+
+#order-modal-backdrop.flex {
+  display: flex !important;
+}
+

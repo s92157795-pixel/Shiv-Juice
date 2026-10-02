@@ -1,0 +1,2971 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_standard" name="shell-type"/>
+  <title>Shiv Juice Center — Sonia Vihar 3rd Pusta, Delhi | Fresh Rose Milk & Shakes</title>
+  
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <!-- Leaflet Map Engine for Live Order Tracking -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+  <!-- Razorpay Standard Payment Gateway SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+  <style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    /* Hide scrollbars across all browsers */
+    html, body {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    ::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    /* Pinned Fullscreen Background Canvas */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      background-color: #f7ced8;
+    }
+
+    #sequence-canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+
+    /* Pop-Up Box Styling: Transparent Background, Crisp Intact Border, Smooth Transitions */
+    .pop-card-left,
+    .pop-card-right {
+      background: rgba(255, 255, 255, 0.14) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border: 1.5px solid rgba(184, 16, 89, 0.45) !important;
+      box-shadow: 0 10px 32px rgba(120, 0, 38, 0.08) !important;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, border-color 0.25s ease;
+      will-change: opacity, transform;
+    }
+
+    .pop-card-left:hover,
+    .pop-card-right:hover,
+    .pop-card-left:focus-within,
+    .pop-card-right:focus-within {
+      opacity: 1 !important;
+      background: rgba(255, 255, 255, 0.38) !important;
+      border-color: rgba(184, 16, 89, 0.85) !important;
+      transform: translate(0, 0) scale(1.02) !important;
+    }
+
+    #hero-welcome-overlay {
+      will-change: opacity, transform;
+      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    }
+
+    #tracking-map {
+      width: 100%;
+      height: 240px;
+      border-radius: 1rem;
+      z-index: 10;
+    }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-secondary-fixed": "#3f0019",
+            "on-secondary": "#ffffff",
+            "surface": "#fff8f8",
+            "primary": "#780026",
+            "primary-fixed": "#ffd9dc",
+            "on-primary": "#ffffff",
+            "secondary": "#b81059",
+            "surface-container-high": "#ffe1e6",
+            "surface-container-low": "#fff0f2",
+            "surface-container-lowest": "#ffffff",
+            "surface-container": "#ffe8ec",
+            "tertiary": "#005e29",
+            "tertiary-fixed": "#95f8a7",
+            "on-surface": "#2b151b",
+            "on-surface-variant": "#594143"
+          },
+          fontFamily: {
+            "headline-md": ["Playfair Display"],
+            "headline-lg": ["Playfair Display"],
+            "headline-sm": ["Playfair Display"],
+            "body-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-primary">
+
+  <!-- ================================================================= -->
+  <!-- FULLSCREEN GATEKEEPER: LOGIN / SIGNUP SCREEN (PINK COLOR ONLY)     -->
+  <!-- ================================================================= -->
+  <div id="login-gateway-screen" class="fixed inset-0 z-[99999] bg-[#f7ced8] flex items-center justify-center p-4 overflow-y-auto transition-all duration-500">
+    <div class="max-w-[440px] w-full rounded-3xl p-6 sm:p-7 bg-white/45 backdrop-blur-2xl border-2 border-primary/30 shadow-2xl relative my-auto flex flex-col gap-4">
+      
+      <!-- Brand & Hub Header -->
+      <div class="text-center flex flex-col items-center">
+        <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-2 shadow-inner">
+          <span class="material-symbols-outlined text-primary text-3xl">local_cafe</span>
+        </div>
+        <h2 class="font-headline-sm text-2xl font-bold text-primary tracking-tight">Shiv Juice Center</h2>
+        <span class="text-[10px] text-secondary font-bold uppercase tracking-widest mt-0.5">Sonia Vihar 3rd Pusta, Delhi</span>
+        <p class="text-xs text-on-surface-variant mt-1.5 font-medium">Please sign in to order &amp; track your delivery in Delhi</p>
+      </div>
+
+      <!-- MOBILE NUMBER & OTP LOGIN ONLY -->
+      <div class="bg-surface-container-lowest/90 rounded-2xl p-4 sm:p-5 border border-primary/25 shadow-sm flex flex-col gap-3">
+        <div class="flex items-center justify-between pb-1.5 border-b border-outline-variant/30">
+          <span class="text-xs font-bold text-primary flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[17px] text-secondary">phone_iphone</span>
+            Mobile Number &amp; OTP Verification
+          </span>
+          <span class="text-[9.5px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold uppercase border border-emerald-200">Instant SMS</span>
+        </div>
+
+        <!-- Step 1A: Mobile Number Input -->
+        <div id="otp-step-mobile" class="flex flex-col gap-2.5">
+          <label class="block text-[11px] font-bold text-primary">Enter 10-Digit Mobile Number</label>
+          <div class="flex gap-1.5">
+            <span class="inline-flex items-center px-3 rounded-xl bg-surface-container text-xs text-on-surface-variant font-bold border border-outline-variant/40">+91</span>
+            <input type="tel" id="login-mobile-input" maxlength="10" placeholder="Enter any 10-digit mobile number" class="flex-1 px-3 py-2 rounded-xl bg-white text-xs font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40 shadow-inner" />
+          </div>
+
+          <button type="button" id="btn-send-otp" onclick="handleSendOtp()" class="w-full py-2.5 rounded-full bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-md hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">sms</span>
+            <span id="btn-send-otp-text">Send OTP to Mobile Message Box</span>
+          </button>
+        </div>
+
+        <!-- Step 1B: OTP Input & Verification (Strict Backend Verification) -->
+        <div id="otp-step-verify" class="hidden flex-col gap-2.5 pt-1">
+          <!-- Real Mobile Message Box Dispatch Confirmation Banner -->
+          <div id="sms-status-banner" class="p-3 rounded-xl bg-primary/10 border border-primary/20 text-on-surface text-xs flex items-start gap-2.5 shadow-sm">
+            <span class="material-symbols-outlined text-primary text-xl shrink-0 mt-0.5">mark_email_unread</span>
+            <div class="flex-1 text-[11px] leading-snug">
+              <span id="sms-status-text">OTP sent directly to your phone's <strong>Mobile Message Box (SMS)</strong> on <strong id="verify-mobile-label" class="text-primary font-bold">+91 ----------</strong>. Please open your SMS Messages app to view the code.</span>
+            </div>
+          </div>
+
+          <label class="block text-[11px] font-bold text-primary">Enter 6-Digit OTP from Mobile Message Box</label>
+          <input type="text" id="login-otp-input" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="• • • • • •" class="w-full px-4 py-2.5 rounded-xl bg-white text-base font-mono font-bold text-center tracking-[0.35em] text-primary focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40 shadow-inner" />
+
+          <!-- Dynamic Server Verification Status / Error Message -->
+          <div id="otp-error-msg" class="hidden text-[11px] font-semibold text-center py-0.5"></div>
+
+          <div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-0.5">
+            <button type="button" id="btn-resend-otp" onclick="handleResendOtp()" class="text-secondary hover:underline font-bold disabled:text-gray-400 disabled:no-underline" disabled>
+              Resend in <span id="resend-countdown">30</span>s
+            </button>
+            <button type="button" onclick="resetOtpStep()" class="text-primary hover:underline font-bold">Change Number</button>
+          </div>
+
+          <button type="button" id="btn-verify-otp" onclick="handleVerifyOtp()" class="w-full mt-1 py-2.5 rounded-full bg-secondary hover:bg-secondary/90 text-white text-xs font-bold shadow-md hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">verified_user</span>
+            <span id="btn-verify-otp-text">Verify via Server &amp; Enter Website</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hub Guarantee Footer -->
+      <div class="text-center text-[10px] text-primary/80 font-medium">
+        ⚡ Chilled dispatch hub: <strong>Sonia Vihar 3rd Pusta, Delhi - 110094</strong>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Pinned Fullscreen Background Canvas -->
+  <div id="canvas-container">
+    <canvas id="sequence-canvas"></canvas>
+  </div>
+
+  <!-- Sleek Compact Navbar (h-12 / 48px) -->
+  <header class="fixed top-0 left-0 right-0 z-40 bg-surface/85 backdrop-blur-md border-b border-outline-variant/20 shadow-sm transition-all duration-300">
+    <div class="h-12 max-w-[1340px] mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 shrink-0">
+        <a class="flex items-center gap-2 group" href="#hero-section">
+          <img alt="New Fresh Rose Milk Logo" class="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApsSeDYemQI34XbJJe-h2fE5_qT3uTtdPOkdH76ycU_U91F82WlihNmY7PQgapByG6W0BvZmC2fNPriDJ0s-j6d3XakTb1sd78veHkZngrKfcoRL3ql1ebO1FQeR2Zwkg3cun6C1hE3nRfrO5UjXyLO6UXE2QROe7gfv20kt-H6gu_7qSSfN3ZechoCsWAV44ozbpOtJXbccGA_U_631am9oAaVuL8JFNOHqCbxWOELQZacmSIHYVUng"/>
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-sm text-primary tracking-tight font-bold leading-none">Shiv Juice Center</span>
+            <span class="text-[8.5px] text-secondary tracking-widest uppercase font-bold leading-none mt-0.5">Sonia Vihar 3rd Pusta, Delhi</span>
+          </div>
+        </a>
+      </div>
+      <nav class="hidden md:flex items-center gap-4">
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors py-1" href="#hero-section">Home</a>
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors py-1 font-bold text-secondary" href="#juice-prices">Juice Prices</a>
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors py-1" href="#shop-location">Shop Location</a>
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors py-1" href="#quick-order">Express Crate</a>
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors py-1" href="#reviews">Reviews</a>
+      </nav>
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Logged-in User Badge in Navbar -->
+        <div id="nav-user-badge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-xs border border-primary/20">
+          <span id="nav-user-avatar" onclick="openUserProfileModal()" class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold cursor-pointer hover:scale-110 transition-transform">👤</span>
+          <span id="nav-user-name" onclick="openUserProfileModal()" class="font-bold text-primary max-w-[90px] truncate text-[11px] cursor-pointer hover:underline">User</span>
+          <button type="button" onclick="handleLogout()" class="text-[10px] text-secondary hover:underline font-bold ml-1" title="Log out">Logout</button>
+        </div>
+
+        <!-- Customer Profile Section Button -->
+        <button id="nav-btn-profile" onclick="openUserProfileModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white text-primary text-xs font-semibold border border-primary/25 shadow-sm transition-all hover:scale-105" title="Customer Profile &amp; Basic Details">
+          <span class="material-symbols-outlined text-[16px] text-secondary">account_circle</span>
+          <span id="nav-profile-text">My Profile</span>
+        </button>
+
+        <button onclick="openTrackOrderModal()" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-container text-primary text-xs font-semibold border border-primary/20 transition-all" title="Track Live Delivery">
+          <span class="material-symbols-outlined text-[15px] text-secondary">local_shipping</span>
+          <span>Track Order</span>
+        </button>
+        <button onclick="openOrderModal('Classic Damascus Rose Milk', 75)" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold shadow-sm transition-all">
+          <span class="material-symbols-outlined text-[15px]">shopping_bag</span>
+          <span>Buy Now</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Scrollable Content -->
+  <main class="relative z-10 w-full">
+    <div class="flex flex-col w-full">
+
+      <!-- ================================================================= -->
+      <!-- HERO WELCOME SECTION: Big Heading & Image of Girl Drinking Shake  -->
+      <!-- ================================================================= -->
+      <section id="hero-section" class="relative w-full min-h-[115vh] flex flex-col justify-center items-center px-4 pt-20 pb-16 pointer-events-none">
+        
+        <!-- Welcome Hero Overlay (Fades out and disappears on scroll) -->
+        <div id="hero-welcome-overlay" class="relative w-full max-w-5xl mx-auto pointer-events-auto flex flex-col items-center text-center gap-4 sm:gap-5">
+          
+          <!-- TOP-LEFT: Small Pocket Pouch of this Drink (Cost: ₹10 - Disappears on Scroll) -->
+          <div class="md:absolute md:top-0 md:left-0 lg:-left-4 z-20 w-full max-w-[310px] md:max-w-[265px] lg:max-w-[285px] p-2.5 sm:p-3 rounded-2xl bg-white/85 backdrop-blur-xl border-2 border-primary/30 shadow-xl flex items-center gap-2.5 text-left transform hover:scale-105 transition-all group pointer-events-auto mx-auto md:mx-0">
+            <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shrink-0 border border-primary/25 bg-primary/5 shadow-inner">
+              <img src="pouch_rose_milk.jpg" alt="Shiv Mini Rose Milk Pouch (120ml) for ₹10" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"/>
+              <span class="absolute top-0.5 right-0.5 px-1 py-0.2 rounded bg-secondary text-white text-[8px] font-bold tracking-tight shadow">120ml</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1">
+                <span class="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[8.5px] font-bold tracking-wide">⭐ Pouch</span>
+                <span class="text-[9.5px] text-secondary font-bold">Only ₹10</span>
+              </div>
+              <h3 class="font-headline-sm text-xs sm:text-sm font-bold text-primary leading-tight mt-0.5 truncate">
+                Shiv Rose Milk Pouch
+              </h3>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span class="font-headline-md text-sm sm:text-base font-bold text-primary">₹10</span>
+                <span class="text-[9.5px] text-on-surface-variant line-through">₹20</span>
+                <span class="text-[8.5px] text-emerald-700 font-bold">50% Off</span>
+              </div>
+            </div>
+            <button type="button" onclick="openOrderModal('Shiv Mini Rose Milk Pouch (120ml)', 10)" class="px-3 py-1.5 rounded-full bg-primary hover:bg-primary-container text-white text-[11px] font-bold shadow-md hover:scale-105 transition-all shrink-0 flex items-center gap-0.5">
+              <span>Buy</span>
+              <span class="material-symbols-outlined text-[13px]">bolt</span>
+            </button>
+          </div>
+
+          <!-- Top Badge with Hub Location -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 backdrop-blur-md border border-white/70 shadow-sm text-secondary text-xs sm:text-sm font-bold uppercase tracking-wider">
+            <span class="material-symbols-outlined text-[18px]">location_on</span>
+            Hub: Sonia Vihar 3rd Pusta, Delhi - 110094
+          </div>
+          
+          <!-- Big Bold Welcome Line -->
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-primary font-headline-lg leading-tight drop-shadow-sm max-w-2xl mx-auto">
+            Welcome Sir in <br class="sm:hidden"/>
+            <span class="bg-gradient-to-r from-primary via-secondary to-primary-container bg-clip-text text-transparent">Shiv Juice Center</span> 😀
+          </h1>
+
+          <!-- Generated Image of Girl Happily Drinking the Rose Milk Shake -->
+          <div class="relative w-44 sm:w-56 lg:w-64 rounded-3xl overflow-hidden shadow-2xl border-4 border-white/90 backdrop-blur-md transform hover:scale-105 transition-all duration-300 my-1 group">
+            <img src="girl_drinking_shake.jpg" alt="Joyful girl drinking fresh chilled rose milk shake at Shiv Juice Center Sonia Vihar" class="w-full h-auto object-cover block"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            
+            <div class="absolute bottom-2 left-2 right-2 px-2.5 py-1 rounded-xl bg-surface-container-lowest/90 backdrop-blur-md text-[10px] font-bold text-primary shadow-sm flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[13px] text-secondary">favorite</span>
+              <span>Loved by Rose Lovers</span>
+            </div>
+          </div>
+
+          <p class="text-xs sm:text-sm text-on-surface-variant font-medium max-w-md leading-relaxed">
+            Fresh cold-pressed Damask rose petals whipped in organic milk. Dispatched directly from our <strong>Sonia Vihar 3rd Pusta</strong> hub!
+          </p>
+
+          <!-- Animated Scroll Prompt -->
+          <div class="flex items-center gap-1.5 text-primary text-xs font-bold tracking-widest uppercase opacity-85 pt-2 animate-bounce">
+            <span>Scroll Down for Juice Prices &amp; Live Tracking</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 1: JUICE PRICES & MENU (Split Left & Right Pop-Up)        -->
+      <!-- ================================================================= -->
+      <section class="pop-section-pair w-full min-h-[90vh] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 lg:px-12 py-10 gap-6 my-6 pointer-events-none" id="juice-prices">
+        
+        <!-- Left Piece: Single Bottle Juices & Prices -->
+        <div class="pop-card-left max-w-[440px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col gap-3">
+          <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+            <div>
+              <span class="text-[10px] text-secondary font-bold uppercase tracking-wider block">Menu &amp; Tariff</span>
+              <h2 class="font-headline-lg text-xl text-primary font-bold">Single Bottle Specials</h2>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-secondary text-[10px] font-bold">300ml Bottles</span>
+          </div>
+
+          <!-- Price Item 1 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <span class="text-xs font-bold text-primary block">Classic Damascus Rose Milk</span>
+              <span class="text-[10px] text-on-surface-variant">Crimson petals &amp; slow-churned whole cream</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹75</span>
+              <button onclick="openOrderModal('Classic Damascus Rose Milk', 75)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Item 2 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <span class="text-xs font-bold text-primary block">Royal Almond Badam Rose</span>
+              <span class="text-[10px] text-on-surface-variant">Stoneground Mamra badam paste &amp; milk</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹95</span>
+              <button onclick="openOrderModal('Royal Almond Badam Rose', 95)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Item 3 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <span class="text-xs font-bold text-primary block">Cardamom Rose Velvet</span>
+              <span class="text-[10px] text-on-surface-variant">Idukki green elaichi &amp; cooling rose nectar</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹85</span>
+              <button onclick="openOrderModal('Cardamom Rose Velvet', 85)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Item 4 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <span class="text-xs font-bold text-primary block">Honey Rose Organic Breeze</span>
+              <span class="text-[10px] text-on-surface-variant">Raw Himalayan honey, 0% cane sugar</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹90</span>
+              <button onclick="openOrderModal('Honey Rose Organic Breeze', 90)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Piece: Special Shakes & Combos -->
+        <div class="pop-card-right max-w-[440px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col gap-3">
+          <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+            <div>
+              <span class="text-[10px] text-tertiary font-bold uppercase tracking-wider block">Signature Combos</span>
+              <h2 class="font-headline-lg text-xl text-primary font-bold">Party Packs &amp; Giant Shakes</h2>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold">Best Value</span>
+          </div>
+
+          <!-- Price Item 5 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <span class="text-xs font-bold text-primary block">Kashmiri Kesar Badam Rose (500ml)</span>
+              <span class="text-[10px] text-on-surface-variant">Saffron threads infused in heavy cream</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹120</span>
+              <button onclick="openOrderModal('Kashmiri Kesar Badam Rose (500ml)', 120)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Item 6 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <div class="flex items-center gap-1">
+                <span class="text-xs font-bold text-primary block">Shiv Special Host Box (6 Bottles)</span>
+                <span class="px-1 py-0.2 rounded bg-secondary text-white text-[8px] font-bold">Popular</span>
+              </div>
+              <span class="text-[10px] text-on-surface-variant">Assorted 6 chilled bottles in thermal crate</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹420</span>
+              <button onclick="openOrderModal('Shiv Special Host Box (6 Bottles)', 420)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Item 7 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <span class="text-xs font-bold text-primary block">Fresh Fruit Rose Fusion (500ml)</span>
+              <span class="text-[10px] text-on-surface-variant">Real strawberry, pomegranate &amp; rose cream</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹110</span>
+              <button onclick="openOrderModal('Fresh Fruit Rose Fusion (500ml)', 110)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Item 8 -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <div>
+              <div class="flex items-center gap-1">
+                <span class="text-xs font-bold text-primary block">Weekly Health Cellar (12 Bottles)</span>
+                <span class="px-1 py-0.2 rounded bg-tertiary text-white text-[8px] font-bold">Save 15%</span>
+              </div>
+              <span class="text-[10px] text-on-surface-variant">Complete weekly morning vitality pack</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-sm font-bold text-primary">₹790</span>
+              <button onclick="openOrderModal('Weekly Health Cellar (12 Bottles)', 790)" class="px-3 py-1 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-sm transition-all hover:scale-105" type="button">
+                Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 2: SHOP LOCATION (Sonia Vihar 3rd Pusta, Delhi)           -->
+      <!-- ================================================================= -->
+      <section class="pop-section-pair w-full min-h-[85vh] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 lg:px-12 py-10 gap-6 my-6 pointer-events-none" id="shop-location">
+        
+        <!-- Left Piece: Storefront Info & Address Details -->
+        <div class="pop-card-left max-w-[440px] w-full rounded-2xl p-6 pointer-events-auto flex flex-col gap-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold self-start">
+            <span class="material-symbols-outlined text-[16px]">storefront</span>
+            Flagship Production &amp; Chill Hub
+          </div>
+          <h2 class="font-headline-lg text-2xl lg:text-3xl text-primary font-bold tracking-tight">
+            Shiv Juice Center
+          </h2>
+          <div class="p-3.5 rounded-xl bg-surface-container-lowest/80 border border-white/70 text-xs text-on-surface flex flex-col gap-2">
+            <div class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-secondary text-base shrink-0 mt-0.5">pin_drop</span>
+              <span><strong>Address:</strong> Sonia Vihar 3rd Pusta, Main Yamuna Pusta Road, North East Delhi, Delhi - 110094</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-tertiary text-base shrink-0">schedule</span>
+              <span><strong>Operating Hours:</strong> 06:00 AM — 11:30 PM (Daily Fresh)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-base shrink-0">call</span>
+              <span><strong>Direct Order Helpline:</strong> +91 87997 79715</span>
+            </div>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed">
+            All online orders are bottled fresh and dispatched straight from our <strong>Sonia Vihar 3rd Pusta</strong> chilled cellar in insulated boxes.
+          </p>
+          <a href="https://maps.google.com/?q=Sonia+Vihar+3rd+Pusta+Delhi" target="_blank" class="px-5 py-2 rounded-full bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-md inline-flex items-center gap-1.5 self-start transition-all hover:scale-105">
+            <span class="material-symbols-outlined text-[15px]">map</span>
+            <span>Open in Google Maps App</span>
+          </a>
+        </div>
+
+        <!-- Right Piece: Interactive Google Maps Embed of Sonia Vihar 3rd Pusta -->
+        <div class="pop-card-right max-w-[460px] w-full rounded-2xl p-4 pointer-events-auto flex flex-col gap-2">
+          <div class="flex items-center justify-between pb-1.5 border-b border-outline-variant/30">
+            <span class="text-xs font-bold text-primary flex items-center gap-1">
+              <span class="material-symbols-outlined text-secondary text-sm">explore</span>
+              Sonia Vihar 3rd Pusta on Google Maps
+            </span>
+            <span class="text-[10px] text-tertiary font-bold">Live GPS Anchor</span>
+          </div>
+          <!-- Google Maps Embed -->
+          <div class="w-full h-64 rounded-xl overflow-hidden shadow-inner border border-white/80">
+            <iframe 
+              title="Shiv Juice Center Sonia Vihar 3rd Pusta Google Map"
+              width="100%" 
+              height="100%" 
+              style="border:0;" 
+              loading="lazy" 
+              allowfullscreen 
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=Sonia%20Vihar%203rd%20Pusta%20Delhi&t=&z=15&ie=UTF8&iwloc=&output=embed">
+            </iframe>
+          </div>
+          <span class="text-[10px] text-on-surface-variant text-center">
+            Dispatch radius covers Delhi NCR, Ghaziabad, Noida &amp; suburbs in 25-45 mins.
+          </span>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 3: CONNOISSEUR EXPRESS SIP TRAY (Custom Crate Builder)    -->
+      <!-- ================================================================= -->
+      <section class="pop-section-pair w-full min-h-[90vh] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 lg:px-12 py-10 gap-6 my-6 pointer-events-none" id="quick-order">
+        
+        <!-- Left Piece: Pack Selection & Bottle Customizers -->
+        <div class="pop-card-left max-w-[420px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col gap-3">
+          <div>
+            <span class="text-[10px] text-secondary uppercase font-bold tracking-widest block mb-0.5">Sonia Vihar Hub Dispatch</span>
+            <h2 class="font-headline-lg text-2xl text-primary font-semibold">Custom Crate Builder</h2>
+          </div>
+
+          <!-- Pack Size Selector -->
+          <div>
+            <label class="text-[11px] font-bold text-primary block mb-1.5">1. Select Your Tasting Pack</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button class="pack-btn p-2 rounded-xl bg-surface-container-lowest/80 text-left transition-all border-2 border-primary" onclick="selectPack(3, 215, this)" type="button">
+                <span class="text-xs font-bold text-primary block">3 Bottles</span>
+                <span class="text-[9px] text-on-surface-variant">Tasting</span>
+                <span class="text-[10px] text-secondary font-bold block mt-0.5">₹215</span>
+              </button>
+              <button class="pack-btn p-2 rounded-xl bg-surface-container-lowest/80 text-left transition-all border-2 border-transparent hover:border-secondary" onclick="selectPack(6, 420, this)" type="button">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-primary block">6 Bottles</span>
+                  <span class="px-1 py-0.5 rounded bg-secondary text-on-secondary text-[8px]">Shiv Pick</span>
+                </div>
+                <span class="text-[9px] text-on-surface-variant">Host Box</span>
+                <span class="text-[10px] text-secondary font-bold block mt-0.5">₹420</span>
+              </button>
+              <button class="pack-btn p-2 rounded-xl bg-surface-container-lowest/80 text-left transition-all border-2 border-transparent hover:border-secondary" onclick="selectPack(12, 790, this)" type="button">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-primary block">12 Bottles</span>
+                  <span class="px-1 py-0.5 rounded bg-tertiary text-on-tertiary text-[8px]">-15%</span>
+                </div>
+                <span class="text-[9px] text-on-surface-variant">Cellar</span>
+                <span class="text-[10px] text-secondary font-bold block mt-0.5">₹790</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Assortment Quantity Adjusters -->
+          <div>
+            <label class="text-[11px] font-bold text-primary block mb-1.5">2. Curate Your Flavors</label>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-primary text-[10px] font-bold">1</div>
+                  <span class="text-xs font-semibold text-on-surface">Classic Damascus</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center" onclick="adjustCount('c1', -1)" type="button">-</button>
+                  <span class="text-xs font-bold text-primary w-3 text-center" id="c1-count">2</span>
+                  <button class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center" onclick="adjustCount('c1', 1)" type="button">+</button>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-primary text-[10px] font-bold">2</div>
+                  <span class="text-xs font-semibold text-on-surface">Royal Almond</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center" onclick="adjustCount('c2', -1)" type="button">-</button>
+                  <span class="text-xs font-bold text-primary w-3 text-center" id="c2-count">1</span>
+                  <button class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center" onclick="adjustCount('c2', 1)" type="button">+</button>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-primary text-[10px] font-bold">3</div>
+                  <span class="text-xs font-semibold text-on-surface">Cardamom Rose</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center" onclick="adjustCount('c3', -1)" type="button">-</button>
+                  <span class="text-xs font-bold text-primary w-3 text-center" id="c3-count">0</span>
+                  <button class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center" onclick="adjustCount('c3', 1)" type="button">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Piece: Summary & Buy Crate Button -->
+        <div class="pop-card-right max-w-[420px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col justify-between gap-3">
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+              <span class="font-headline-sm text-sm text-primary font-bold">Selected Crate</span>
+              <span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[9px] font-bold flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[11px]">thermostat</span> 4°C Fresh
+              </span>
+            </div>
+
+            <!-- Details -->
+            <div class="py-2.5 space-y-1.5 text-xs text-on-surface-variant">
+              <div class="flex justify-between">
+                <span>Selected Package:</span>
+                <span class="font-semibold text-on-surface" id="summary-pack">3-Bottle Tasting Crate</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Total Quantity:</span>
+                <span class="font-semibold text-on-surface" id="summary-bottles">3 Bottles</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Subtotal:</span>
+                <span class="font-semibold text-on-surface" id="summary-subtotal">₹215.00</span>
+              </div>
+              <div class="flex justify-between text-tertiary font-semibold">
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">local_shipping</span> Cold Transit:</span>
+                <span>FREE (From Sonia Vihar Hub)</span>
+              </div>
+            </div>
+
+            <!-- Total Bar -->
+            <div class="bg-surface-container-low/90 p-2.5 rounded-xl flex items-baseline justify-between mb-3 border border-white/60">
+              <div>
+                <span class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">Total To Pay</span>
+                <p class="text-[9px] text-on-surface-variant/70">All taxes included</p>
+              </div>
+              <span class="font-headline-md text-lg text-primary font-bold" id="summary-total">₹215</span>
+            </div>
+
+            <p class="text-[10px] text-on-surface-variant mb-2">
+              Ready for immediate dispatch to your doorstep. Fill delivery details:
+            </p>
+          </div>
+
+          <button class="w-full py-2.5 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold text-center shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5" onclick="openOrderModalFromTray()" type="button">
+            <span class="material-symbols-outlined text-[15px]">shopping_bag</span>
+            <span>Proceed to Buy Crate</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 4: ARTISANAL CRAFT & CHRONICLE (Split Left & Right)       -->
+      <!-- ================================================================= -->
+      <section class="pop-section-pair w-full min-h-[90vh] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 lg:px-12 py-10 gap-6 my-6 pointer-events-none" id="craft-story">
+        
+        <!-- Left Piece: Heritage Editorial & Quote -->
+        <div class="pop-card-left max-w-[420px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col gap-2.5">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[10px] font-semibold self-start">
+            <span class="material-symbols-outlined text-[13px]">history_edu</span>
+            The Heritage Chronicle
+          </div>
+          <h2 class="font-headline-lg text-xl lg:text-2xl text-primary tracking-tight font-semibold">
+            How An Ancient Royal Beverage Became Shiv's Daily Obsession.
+          </h2>
+          <p class="text-xs text-on-surface-variant leading-relaxed">
+            In medieval Indian courtyards, rose milk was served to royalty to immediately replenish body equilibrium and lower inner heat.
+          </p>
+          <blockquote class="p-3 rounded-xl bg-surface-container-lowest/80 border-l-4 border-primary shadow-sm border border-white/60">
+            <p class="font-headline-sm text-xs italic text-primary leading-snug">
+              "We didn't modernize rose milk. We simply restored its forgotten royalty: genuine cow milk creaminess and wild petals so aromatic you smell the garden before the first sip."
+            </p>
+            <cite class="block text-[10px] font-bold text-secondary mt-1.5 not-italic">
+              — Shiv, Brand Ambassador
+            </cite>
+          </blockquote>
+          <div class="flex items-center gap-3 pt-1">
+            <div>
+              <span class="font-headline-md text-base font-bold text-primary block">100%</span>
+              <span class="text-[9px] text-on-surface-variant uppercase">Organic Petals</span>
+            </div>
+            <div class="w-px h-6 bg-outline-variant"></div>
+            <div>
+              <span class="font-headline-md text-base font-bold text-primary block">0%</span>
+              <span class="text-[9px] text-on-surface-variant uppercase">Chemicals</span>
+            </div>
+            <div class="w-px h-6 bg-outline-variant"></div>
+            <div>
+              <span class="font-headline-md text-base font-bold text-primary block">48 Hrs</span>
+              <span class="text-[9px] text-on-surface-variant uppercase">Farm Fresh</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Piece: 4 Process Milestones -->
+        <div class="pop-card-right max-w-[420px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col gap-2">
+          <div class="flex items-center justify-between pb-1.5 border-b border-outline-variant/30">
+            <span class="text-xs font-bold text-primary">The 4-Step Craft</span>
+            <span class="text-[10px] text-tertiary font-bold">Unpasteurized Freshness</span>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60 flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-secondary text-xl shrink-0">nature_people</span>
+            <div>
+              <span class="text-xs font-bold text-primary block">04:30 AM • Dawn Plucking</span>
+              <span class="text-[10px] text-on-surface-variant leading-tight block">Harvested before sunrise to capture fragile aromatic floral lipids intact.</span>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-surface-container-high/60 border border-white/60 flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-tertiary text-xl shrink-0">cruelty_free</span>
+            <div>
+              <span class="text-xs font-bold text-primary block">A2 Cow Heritage</span>
+              <span class="text-[10px] text-on-surface-variant leading-tight block">Single-estate untreated farm milk with high natural velvety cream content.</span>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-surface-container-highest/70 border border-white/60 flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-primary text-xl shrink-0">hourglass_bottom</span>
+            <div>
+              <span class="text-xs font-bold text-primary block">18-Hour Cold Steeping</span>
+              <span class="text-[10px] text-on-surface-variant leading-tight block">Slow botanical steeping preserves micro-nutrients without thermal loss.</span>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-surface-container-lowest/80 border border-white/60 flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-secondary text-xl shrink-0">inventory_2</span>
+            <div>
+              <span class="text-xs font-bold text-primary block">Sealed at 4°C in Sonia Vihar</span>
+              <span class="text-[10px] text-on-surface-variant leading-tight block">Arrives condensation-kissed, chilled, and ready for immediate indulgence.</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 5: CONNOISSEUR REVIEWS (Split Left & Right)               -->
+      <!-- ================================================================= -->
+      <section class="pop-section-pair w-full min-h-[90vh] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 lg:px-12 py-10 gap-6 my-6 pointer-events-none" id="reviews">
+        
+        <!-- Left Piece: Score & Review 1 -->
+        <div class="pop-card-left max-w-[420px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col gap-3">
+          <div>
+            <div class="flex items-center text-secondary mb-1">
+              <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="text-xs font-bold text-primary ml-2">4.9 / 5</span>
+            </div>
+            <h2 class="font-headline-lg text-xl text-primary font-semibold">Tasted &amp; Celebrated Across India</h2>
+            <p class="text-[11px] text-on-surface-variant">Over 42,000 verified bottle tastings nationwide.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <p class="text-xs text-on-surface italic leading-relaxed mb-2">
+              "The Royal Almond variant from their Sonia Vihar hub is my absolute post-workout secret. Cold, dense, and deeply comforting."
+            </p>
+            <div class="flex items-center gap-2 pt-2 border-t border-outline-variant/30">
+              <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center font-bold text-[10px] text-on-primary">
+                <span class="material-symbols-outlined text-[13px]">verified</span>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-primary">Dr. Vikramaditya Rao</h4>
+                <p class="text-[9px] text-on-surface-variant">Wellness Columnist • Delhi NCR</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Piece: Review 2 & 3 -->
+        <div class="pop-card-right max-w-[420px] w-full rounded-2xl p-5 pointer-events-auto flex flex-col gap-2.5">
+          <div class="p-3 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <p class="text-xs text-on-surface italic leading-relaxed mb-2">
+              "Night-and-day compared to regular market rose milks. The Damascus floral bouquet lingers like a fine French dessert."
+            </p>
+            <div class="flex items-center gap-2 pt-2 border-t border-outline-variant/30">
+              <div class="w-6 h-6 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-[10px] text-primary">AK</div>
+              <div>
+                <h4 class="text-xs font-bold text-primary">Ananya Kashyap</h4>
+                <p class="text-[9px] text-on-surface-variant">Civil Lines • Verified Taster</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-surface-container-lowest/80 border border-white/60">
+            <p class="text-xs text-on-surface italic leading-relaxed mb-2">
+              "Ordered to Yamuna Vihar. The glass bottle arrived ice-chilled in 25 minutes. Live tracking on the map was spot on!"
+            </p>
+            <div class="flex items-center gap-2 pt-2 border-t border-outline-variant/30">
+              <div class="w-6 h-6 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-[10px] text-primary">MS</div>
+              <div>
+                <h4 class="text-xs font-bold text-primary">Meera Sundaram</h4>
+                <p class="text-[9px] text-on-surface-variant">East Delhi • Verified Subscriber</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 6: LIMITED BATCH & FOOTER (Split Left & Right)            -->
+      <!-- ================================================================= -->
+      <section class="pop-section-pair w-full min-h-[75vh] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 lg:px-12 py-10 gap-6 my-6 pointer-events-none" id="callout-banner">
+        
+        <!-- Left Piece: Shiv Signature Callout -->
+        <div class="pop-card-left max-w-[420px] w-full rounded-2xl p-6 pointer-events-auto flex flex-col gap-3">
+          <span class="text-[10px] uppercase tracking-wider text-secondary font-bold">Direct from Sonia Vihar 3rd Pusta</span>
+          <h2 class="font-headline-lg text-2xl text-primary font-semibold leading-snug">
+            Ready to taste what Shiv drinks every dawn?
+          </h2>
+          <p class="text-xs text-on-surface-variant leading-relaxed">
+            Delivered fresh within 25-45 minutes across all Delhi NCR chill corridors at a crisp 4°C in insulated packaging.
+          </p>
+          <button onclick="openOrderModal('Shiv Special Host Box (6 Bottles)', 420)" class="px-5 py-2.5 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-md hover:-translate-y-0.5 inline-flex items-center gap-1.5 self-start" type="button">
+            <span>Order Shiv's Crate Now</span>
+            <span class="material-symbols-outlined text-[15px]">east</span>
+          </button>
+        </div>
+
+        <!-- Right Piece: Newsletter & Footer Navigation -->
+        <div class="pop-card-right max-w-[420px] w-full rounded-2xl p-6 pointer-events-auto flex flex-col gap-3">
+          <span class="text-xs font-bold text-primary">The Rose Parlour Dispatch</span>
+          <p class="text-[11px] text-on-surface-variant">Receive alerts for single-batch harvests and Shiv's private seasonal curations.</p>
+          <form class="flex items-center gap-1.5" onsubmit="event.preventDefault(); alert('Subscribed to Shiv Juice Center VIP list!');">
+            <input class="flex-1 px-3 py-1.5 rounded-full bg-surface-container-lowest/80 text-on-surface text-xs focus:outline-none focus:ring-2 focus:ring-secondary border border-white/60" placeholder="Enter your email" type="email" required/>
+            <button class="px-4 py-1.5 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold transition-all shrink-0" type="submit">Join</button>
+          </form>
+          <div class="pt-2 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-on-surface-variant">
+            <span>© 2025 Shiv Juice Center</span>
+            <div class="flex items-center gap-3">
+              <a class="hover:text-primary transition-colors" href="#shop-location">Sonia Vihar Hub</a>
+              <a class="hover:text-primary transition-colors" href="javascript:void(0)" onclick="openTrackOrderModal()">Track Order</a>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- AMAZON-GRADE ORDER FORM MODAL                                     -->
+  <!-- ================================================================= -->
+  <div id="order-modal-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 transition-all duration-300">
+    <div id="order-modal-card" class="bg-surface/95 backdrop-blur-2xl rounded-3xl p-5 sm:p-7 max-w-xl w-full border-2 border-primary/40 shadow-2xl relative transform transition-all scale-95 opacity-0 duration-300 max-h-[92vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-outline-variant/30">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+          </div>
+          <div>
+            <span class="text-[9.5px] text-secondary font-bold uppercase tracking-wider block">Amazon-Style Fast Checkout</span>
+            <h3 class="font-headline-sm text-lg sm:text-xl text-primary font-bold">Delivery &amp; Order Details</h3>
+          </div>
+        </div>
+        <button type="button" onclick="closeOrderModal()" class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors font-bold text-xs">
+          ✕
+        </button>
+      </div>
+
+      <!-- Item Preview Bar -->
+      <div class="flex items-center justify-between p-2.5 rounded-2xl bg-surface-container-low/90 border border-primary/20 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-xl">local_cafe</span>
+          <div>
+            <h4 class="text-xs font-bold text-primary" id="modal-juice-title">Classic Damascus Rose</h4>
+            <span class="text-[10px] text-on-surface-variant" id="modal-juice-rate">₹75 / unit • Dispatched from Sonia Vihar</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="adjustModalQty(-1)" class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center hover:bg-surface-container-high">-</button>
+          <span class="text-xs font-bold text-primary w-4 text-center" id="modal-qty">1</span>
+          <button type="button" onclick="adjustModalQty(1)" class="w-6 h-6 rounded-full bg-surface-container text-primary text-xs font-bold flex items-center justify-center hover:bg-surface-container-high">+</button>
+          <span class="text-xs font-bold text-primary ml-1" id="modal-total-price">₹75</span>
+        </div>
+      </div>
+
+      <!-- Amazon-Style Form Fields -->
+      <form id="order-details-form" onsubmit="handleOrderSubmit(event)" class="space-y-2.5">
+        
+        <!-- Pre-filled from Profile Banner -->
+        <div id="checkout-profile-notice" class="hidden items-center justify-between px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 font-medium">
+          <span class="flex items-center gap-1.5 font-bold">
+            <span class="material-symbols-outlined text-base text-emerald-700">verified_user</span>
+            <span id="checkout-profile-notice-text">Pre-filled from your profile</span>
+          </span>
+          <button type="button" onclick="openUserProfileModal()" class="text-[11px] text-primary font-bold hover:underline">Edit Profile</button>
+        </div>
+
+        <!-- Country & Delhi Service Zone Notice -->
+        <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-surface-container text-[11px] font-semibold text-on-surface-variant border border-outline-variant/30">
+          <span class="flex items-center gap-1.5 text-primary font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Delivery Area: Delhi NCR Only
+          </span>
+          <span class="font-bold text-secondary flex items-center gap-1">📍 Sonia Vihar Hub Dispatch</span>
+        </div>
+
+        <!-- Full Name & Mobile Number in 2 Cols -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Full Name *</label>
+            <input type="text" name="name" id="form-name" required placeholder="First and last name" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Mobile Number *</label>
+            <div class="flex">
+              <span class="inline-flex items-center px-2.5 rounded-l-xl bg-surface-container text-xs text-on-surface-variant font-bold border border-r-0 border-outline-variant/40">+91</span>
+              <input type="tel" name="mobile" id="form-mobile" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile" class="w-full px-3 py-1.5 rounded-r-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Email Address (Pre-filled from Login) -->
+        <div>
+          <label class="block text-[11px] font-bold text-primary mb-1">Email Address (Order Confirmation "order are placed" Sent Here) *</label>
+          <input type="email" name="customerEmail" id="form-email" required placeholder="your.name@gmail.com" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+        </div>
+
+        <!-- Delhi Locality Selector (Google Maps Areas) -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-[11px] font-bold text-primary">Delhi Locality (Google Maps Verified) *</label>
+            <span id="locality-eta-badge" class="text-[9.5px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Hub Local: 10-15 Mins</span>
+          </div>
+          <select id="form-delhi-locality" onchange="onDelhiLocalitySelect(this.value)" required class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface font-medium focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40">
+            <optgroup label="⚡ Near Sonia Vihar Hub (Express 10-20 Mins)">
+              <option value="Sonia Vihar 3rd Pusta" selected>Sonia Vihar 3rd Pusta (Store Hub) — 110094</option>
+              <option value="Sonia Vihar (1st-5th Pusta)">Sonia Vihar (1st to 5th Pusta) — 110094</option>
+              <option value="Khajuri Khas">Khajuri Khas / Chowk — 110094</option>
+              <option value="Bhajanpura">Bhajanpura Main Market — 110053</option>
+              <option value="Yamuna Vihar">Yamuna Vihar (Blocks B to C) — 110053</option>
+              <option value="Karawal Nagar">Karawal Nagar / Shiv Vihar — 110094</option>
+              <option value="Wazirabad">Wazirabad / Signature Bridge — 110054</option>
+              <option value="Timarpur">Timarpur / Nehru Vihar — 110054</option>
+            </optgroup>
+            <optgroup label="🏛️ North & Central Delhi (20-35 Mins)">
+              <option value="Civil Lines">Civil Lines / Rajpur Road — 110054</option>
+              <option value="Delhi University North Campus">DU North Campus / GTB Nagar — 110009</option>
+              <option value="Kashmere Gate">Kashmere Gate / ISBT — 110006</option>
+              <option value="Chandni Chowk">Chandni Chowk / Red Fort — 110006</option>
+              <option value="Connaught Place">Connaught Place (CP) / Barakhamba — 110001</option>
+              <option value="Karol Bagh">Karol Bagh / Rajendra Nagar — 110005</option>
+              <option value="Model Town">Model Town / Gujranwala Town — 110009</option>
+            </optgroup>
+            <optgroup label="🏙️ East Delhi (20-35 Mins)">
+              <option value="Shahdara">Shahdara / Mansarovar Park — 110032</option>
+              <option value="Seelampur">Seelampur / Jaffrabad — 110053</option>
+              <option value="Dilshad Garden">Dilshad Garden / GTB Hospital — 110095</option>
+              <option value="Laxmi Nagar">Laxmi Nagar / Vikas Marg — 110092</option>
+              <option value="Preet Vihar">Preet Vihar / Nirman Vihar — 110092</option>
+              <option value="Mayur Vihar">Mayur Vihar (Phase 1, 2, 3) — 110091</option>
+              <option value="Anand Vihar">Anand Vihar / IP Extension — 110092</option>
+            </optgroup>
+            <optgroup label="🌆 North-West & West Delhi (30-45 Mins)">
+              <option value="Pitampura">Pitampura / Netaji Subhash Place — 110034</option>
+              <option value="Rohini">Rohini (Sectors 1 to 24) — 110085</option>
+              <option value="Shalimar Bagh">Shalimar Bagh / Ashok Vihar — 110088</option>
+              <option value="Rajouri Garden">Rajouri Garden / Subhash Nagar — 110027</option>
+              <option value="Janakpuri">Janakpuri / Tilak Nagar — 110058</option>
+              <option value="Dwarka">Dwarka (Sectors 1 to 23) — 110075</option>
+            </optgroup>
+            <optgroup label="🌳 South Delhi (35-50 Mins)">
+              <option value="Lajpat Nagar">Lajpat Nagar / Central Market — 110024</option>
+              <option value="Defence Colony">Defence Colony / South Ext — 110024</option>
+              <option value="Hauz Khas">Hauz Khas / Green Park — 110016</option>
+              <option value="Saket">Saket / Malviya Nagar — 110017</option>
+              <option value="Nehru Place">Nehru Place / Kalkaji — 110019</option>
+              <option value="Greater Kailash">Greater Kailash (GK 1 & 2) — 110048</option>
+              <option value="Vasant Kunj">Vasant Kunj / Mehrauli — 110070</option>
+            </optgroup>
+            <optgroup label="📍 Other Delhi Locality">
+              <option value="Other Delhi Locality">Other Delhi Address (Enter below)</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Flat / House No / Building -->
+        <div>
+          <label class="block text-[11px] font-bold text-primary mb-1">Flat, House no., Building, Company, Apartment *</label>
+          <input type="text" name="flatHouse" id="form-flat" required placeholder="e.g. Flat 302, Gali No. 4 / House 12-A" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+        </div>
+
+        <!-- Area / Street / Gali / Sector -->
+        <div>
+          <label class="block text-[11px] font-bold text-primary mb-1">Street, Gali, Road, Block *</label>
+          <input type="text" name="areaStreet" id="form-street" required placeholder="e.g. 3rd Pusta Main Road / Near Water Plant" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+        </div>
+
+        <!-- Landmark & PIN Code -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Landmark (Optional)</label>
+            <input type="text" name="landmark" id="form-landmark" placeholder="e.g. Near Shiv Mandir / Metro Pillar" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Delhi 6-Digit PIN Code *</label>
+            <input type="text" name="pincode" id="form-pincode" value="110094" required pattern="110[0-9]{3}" maxlength="6" placeholder="110094" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface font-semibold focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+        </div>
+
+        <!-- Town/City & State (Locked to Delhi) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">City / Region (Delhi Only)</label>
+            <input type="text" name="city" id="form-city" value="Delhi (NCT)" readonly class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low text-xs text-on-surface font-semibold border border-outline-variant/40 cursor-not-allowed" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">State</label>
+            <input type="text" name="state" id="form-state" value="Delhi" readonly class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low text-xs text-on-surface font-semibold border border-outline-variant/40 cursor-not-allowed" />
+          </div>
+        </div>
+
+        <!-- Address Type & Payment Method -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Address Type</label>
+            <div class="flex gap-2">
+              <label class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="addressType" value="Home" checked class="text-primary"/>
+                <span>🏠 Home</span>
+              </label>
+              <label class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="addressType" value="Office" class="text-primary"/>
+                <span>🏢 Office</span>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Payment Method</label>
+            <div class="flex gap-2">
+              <label class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="paymentMethod" value="Cash on Delivery" class="text-primary"/>
+                <span>💵 Cash on Delivery</span>
+              </label>
+              <label class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="paymentMethod" value="Razorpay" checked class="text-primary"/>
+                <span>💳 Razorpay / UPI</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Freshness & Hub Dispatch Guarantee (Clean UI, No Backend Details) -->
+        <div class="p-2.5 rounded-xl bg-surface-container text-[11px] text-on-surface-variant flex items-center justify-between border border-outline-variant/30">
+          <div class="flex items-center gap-1.5 font-bold text-primary">
+            <span class="material-symbols-outlined text-[16px] text-emerald-700">verified</span>
+            <span>100% Chilled Delivery Guarantee</span>
+          </div>
+          <span class="text-[10px] text-secondary font-bold">Sonia Vihar 3rd Pusta Hub</span>
+        </div>
+
+        <!-- Save / Update Profile Checkbox -->
+        <div class="p-2 rounded-xl bg-surface-container-low border border-primary/20 flex items-center gap-2">
+          <input type="checkbox" id="form-save-profile-checkbox" checked class="w-4 h-4 rounded text-primary focus:ring-secondary accent-primary cursor-pointer"/>
+          <label for="form-save-profile-checkbox" class="text-[11px] text-primary font-semibold cursor-pointer">
+            💾 Save / update these address details in my Customer Profile for 1-click checkout
+          </label>
+        </div>
+
+        <!-- TWO BUTTONS IN THE END: SUBMIT & CANCEL -->
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-outline-variant/30">
+          <button type="button" onclick="closeOrderModal()" class="px-5 py-2 rounded-full bg-surface-container hover:bg-surface-container-high text-primary text-xs font-bold transition-all border border-outline-variant/40">
+            Cancel
+          </button>
+          <button type="submit" id="form-submit-btn" class="px-6 py-2 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-lg hover:-translate-y-0.5 inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[15px]">check_circle</span>
+            <span>Place Your Order</span>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- ================================================================= -->
+      <!-- REAL UPI PAYMENT GATEWAY & SCANNER SECTION                        -->
+      <!-- ================================================================= -->
+      <div id="upi-payment-section" class="hidden py-1 flex-col gap-3">
+        
+        <!-- Gateway Header: Business & Dynamic Amount -->
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-primary/20">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-full bg-emerald-500/15 text-emerald-700 flex items-center justify-center font-bold text-lg border border-emerald-500/30">
+              ₹
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h4 class="text-sm font-bold text-primary">Shiv Juice Center</h4>
+                <span class="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">Verified Merchant</span>
+              </div>
+              <span class="text-[10px] text-on-surface-variant font-mono" id="upi-display-id">8799779715@ptaxis</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-[9.5px] uppercase tracking-wider text-on-surface-variant block font-bold">Exact Payable</span>
+            <span class="font-headline-md text-xl font-bold text-primary" id="upi-dynamic-amount">₹0</span>
+          </div>
+        </div>
+
+        <!-- Prominent Razorpay Direct Checkout Action -->
+        <div class="p-3 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-sm">
+          <div class="text-left">
+            <span class="text-xs font-bold text-primary flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm text-secondary">flash_on</span>
+              Razorpay Instant Checkout
+            </span>
+            <span class="text-[10.5px] text-on-surface-variant block">Pay with Google Pay, PhonePe, Paytm, Cards &amp; NetBanking</span>
+          </div>
+          <button type="button" id="razorpay-direct-btn" onclick="openRazorpayGatewayCheckout()" class="w-full sm:w-auto px-5 py-2.5 rounded-full bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-md hover:scale-105 transition-all inline-flex items-center justify-center gap-1.5 shrink-0">
+            <span class="material-symbols-outlined text-sm">credit_card</span>
+            <span>Open Razorpay Modal</span>
+          </button>
+        </div>
+
+        <!-- Dynamic QR Code Scanner Card -->
+        <div class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 text-center shadow-sm">
+          <div class="flex items-center gap-1.5 mb-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+            <span class="text-xs font-bold text-primary">Scan Shiv's QR Code to Pay</span>
+          </div>
+
+          <div class="relative p-2.5 rounded-2xl bg-white border-2 border-primary/20 shadow-md">
+            <img id="upi-qr-image" src="" alt="Dynamic UPI QR Code" class="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-xl"/>
+          </div>
+
+          <div class="mt-2 text-[10.5px] text-on-surface-variant">
+            Paying for: <strong id="upi-items-summary" class="text-primary font-semibold">-</strong>
+          </div>
+
+          <!-- Direct 1-Tap UPI Apps: Google Pay, PhonePe, Paytm, Any UPI -->
+          <div class="w-full mt-3 pt-3 border-t border-outline-variant/20">
+            <span class="text-[10.5px] font-bold text-on-surface-variant block mb-2 uppercase tracking-wider">
+              Or Tap to Pay with Your Installed App
+            </span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
+              <!-- Google Pay -->
+              <a id="upi-app-gpay" href="#" class="px-2.5 py-2 rounded-xl bg-white hover:bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold shadow-sm transition-all hover:scale-105 flex items-center justify-center gap-1.5">
+                <span class="font-bold text-blue-600">G</span>
+                <span>Google Pay</span>
+              </a>
+              <!-- PhonePe -->
+              <a id="upi-app-phonepe" href="#" class="px-2.5 py-2 rounded-xl bg-[#5f259f] hover:bg-[#501e86] text-white text-xs font-bold shadow-sm transition-all hover:scale-105 flex items-center justify-center gap-1.5">
+                <span class="font-bold">पे</span>
+                <span>PhonePe</span>
+              </a>
+              <!-- Paytm -->
+              <a id="upi-app-paytm" href="#" class="px-2.5 py-2 rounded-xl bg-[#002e6e] hover:bg-[#002252] text-white text-xs font-bold shadow-sm transition-all hover:scale-105 flex items-center justify-center gap-1.5">
+                <span class="font-bold text-[#00b9f5]">Pay</span>
+                <span>Paytm</span>
+              </a>
+              <!-- Any UPI App -->
+              <a id="upi-app-any" href="#" class="px-2.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all hover:scale-105 flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                <span>Any UPI</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Copy UPI ID Button -->
+          <div class="mt-2.5">
+            <button type="button" onclick="copyUpiId()" class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary text-[11px] font-bold transition-all border border-outline-variant/40 inline-flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm" id="upi-copy-icon">content_copy</span>
+              <span id="upi-copy-text">Copy UPI ID (8799779715@ptaxis)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Real-Time Server Verification Section -->
+        <div class="p-3.5 rounded-2xl bg-surface-container-low border border-primary/20 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-primary flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm text-tertiary">verified_user</span>
+              Server Payment Verification
+            </span>
+            <span id="upi-status-indicator" class="text-[9.5px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
+              Awaiting Payment
+            </span>
+          </div>
+
+          <p class="text-[10.5px] text-on-surface-variant leading-relaxed">
+            If paid via QR or UPI App, enter the <strong>12-digit Bank Reference / UTR Number</strong> from your payment receipt to verify:
+          </p>
+
+          <div class="flex gap-1.5">
+            <input type="text" id="upi-utr-input" maxlength="12" pattern="[0-9]{12}" placeholder="12-digit UTR (e.g. 428512345678)" class="flex-1 px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs font-mono text-on-surface border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-secondary"/>
+            <button type="button" id="upi-verify-btn" onclick="verifyUpiPayment()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0 transition-all inline-flex items-center gap-1 shadow-sm">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span>
+              <span>Verify</span>
+            </button>
+          </div>
+
+          <!-- Error Alert Banner -->
+          <div id="upi-error-banner" class="hidden p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[10.5px] flex items-center gap-1.5 font-medium">
+            <span class="material-symbols-outlined text-sm shrink-0">error</span>
+            <span id="upi-error-text">Payment verification failed.</span>
+          </div>
+        </div>
+
+        <!-- Back / Edit Controls -->
+        <div class="flex items-center justify-between pt-1">
+          <button type="button" onclick="cancelUpiPayment()" class="px-4 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary text-xs font-semibold transition-all">
+            ← Change Order Details
+          </button>
+          <span class="text-[9.5px] text-on-surface-variant/70 font-mono" id="upi-order-ref">Order #SJC-XXXXXX</span>
+        </div>
+      </div>
+
+      <!-- Order Confirmation Screen (With Prominent "Track Your Order 🛵" Button) -->
+      <div id="order-success-screen" class="hidden text-center py-5 flex-col items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-tertiary/15 text-tertiary flex items-center justify-center mx-auto mb-1">
+          <span class="material-symbols-outlined text-3xl">check_circle</span>
+        </div>
+        <h3 class="font-headline-sm text-xl text-primary font-bold">Payment &amp; Order Placed!</h3>
+        <p class="text-xs text-on-surface-variant max-w-sm">
+          Saved in Google Sheet. Notification <strong>"order are placed"</strong> sent to <strong>kanhaiyapandat4@gmail.com</strong> and <span id="success-user-email" class="font-bold text-primary">your email</span>.
+        </p>
+        
+        <div class="p-3 rounded-2xl bg-surface-container-low border border-primary/20 text-xs text-left w-full space-y-1.5 my-2">
+          <div class="flex justify-between items-center">
+            <span class="font-mono font-bold text-primary text-sm" id="success-order-id">Order ID: #SJC-XXXXXX</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold" id="success-payment-badge">PAID • Verified</span>
+          </div>
+          <div class="flex justify-between items-center text-[11.5px] text-on-surface pt-1 border-t border-outline-variant/30">
+            <span><strong>Amount:</strong> <span id="success-amount-paid" class="text-primary font-bold">₹0</span></span>
+            <span id="success-payment-method" class="font-semibold text-emerald-700">UPI (Verified)</span>
+          </div>
+          <p class="text-[11px] text-on-surface-variant">
+            <strong>Origin Hub:</strong> Shiv Juice Center, Sonia Vihar 3rd Pusta, Delhi - 110094
+          </p>
+          <p class="text-[11px] text-on-surface-variant" id="success-delivery-address">
+            <strong>Deliver To:</strong> -
+          </p>
+        </div>
+
+        <!-- TRACK YOUR ORDER PROMINENT BUTTON -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full pt-1">
+          <button type="button" onclick="openLiveTrackingFromConfirmation()" class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-secondary hover:bg-secondary/90 text-white text-xs font-bold shadow-lg hover:scale-105 transition-all inline-flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-base">delivery_dining</span>
+            <span>Track Your Order Live 🛵</span>
+          </button>
+          <button type="button" onclick="closeOrderModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary text-xs font-semibold">
+            Done
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- LIVE ORDER TRACKING MODAL (Google Maps & Live Rider Movement)     -->
+  <!-- ================================================================= -->
+  <div id="tracking-modal-backdrop" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 transition-all duration-300">
+    <div id="tracking-modal-card" class="bg-surface/95 backdrop-blur-2xl rounded-3xl p-5 sm:p-7 max-w-xl w-full border-2 border-primary/40 shadow-2xl relative transform transition-all scale-95 opacity-0 duration-300 max-h-[92vh] overflow-y-auto">
+      
+      <!-- Tracking Header -->
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-outline-variant/30">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-secondary-fixed text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">navigation</span>
+          </div>
+          <div>
+            <span class="text-[9.5px] text-secondary font-bold uppercase tracking-wider block">Live Delivery Radar</span>
+            <h3 class="font-headline-sm text-lg sm:text-xl text-primary font-bold" id="track-modal-title">Tracking Order</h3>
+          </div>
+        </div>
+        <button type="button" onclick="closeTrackOrderModal()" class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors font-bold text-xs">
+          ✕
+        </button>
+      </div>
+
+      <!-- Order ID Search Bar (in case tracking without recent order) -->
+      <div class="flex gap-1.5 mb-3">
+        <input type="text" id="track-search-input" placeholder="Enter Order ID (e.g. SJC-491527) or Mobile" class="flex-1 px-3 py-1.5 rounded-full bg-surface-container-lowest text-xs text-on-surface border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-secondary"/>
+        <button type="button" onclick="performOrderLookup()" class="px-4 py-1.5 rounded-full bg-primary hover:bg-primary-container text-white text-xs font-bold shrink-0">
+          Find Order
+        </button>
+      </div>
+
+      <!-- Live Delivery Progress Stepper -->
+      <div class="py-2.5 px-3 rounded-2xl bg-surface-container-low/90 border border-primary/20 mb-3">
+        <div class="flex items-center justify-between text-center relative">
+          <!-- Connecting Line -->
+          <div class="absolute top-3.5 left-6 right-6 h-0.5 bg-outline-variant/50 -z-0"></div>
+          <div class="absolute top-3.5 left-6 w-2/3 h-0.5 bg-primary -z-0"></div>
+
+          <!-- Step 1 -->
+          <div class="flex flex-col items-center gap-1 z-10">
+            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-sm">✓</div>
+            <span class="text-[9px] font-bold text-primary">Confirmed</span>
+          </div>
+          <!-- Step 2 -->
+          <div class="flex flex-col items-center gap-1 z-10">
+            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-sm animate-pulse">
+              <span class="material-symbols-outlined text-[14px]">blender</span>
+            </div>
+            <span class="text-[9px] font-bold text-primary">Sonia Vihar Hub</span>
+          </div>
+          <!-- Step 3 -->
+          <div class="flex flex-col items-center gap-1 z-10">
+            <div class="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center text-xs shadow-sm">
+              <span class="material-symbols-outlined text-[14px]">delivery_dining</span>
+            </div>
+            <span class="text-[9px] font-bold text-secondary">On The Way</span>
+          </div>
+          <!-- Step 4 -->
+          <div class="flex flex-col items-center gap-1 z-10">
+            <div class="w-7 h-7 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center text-xs">
+              <span class="material-symbols-outlined text-[14px]">home</span>
+            </div>
+            <span class="text-[9px] font-medium text-on-surface-variant">Arrived</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Map Window (Leaflet Engine centered on Sonia Vihar 3rd Pusta) -->
+      <div class="mb-3 relative">
+        <div id="tracking-map"></div>
+        <div class="absolute top-2 left-2 z-[400] bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-primary shadow-sm border border-primary/20 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+          <span>Live Rider GPS Signal</span>
+        </div>
+      </div>
+
+      <!-- ETA, Origin & Rider Details -->
+      <div class="p-3 rounded-2xl bg-surface-container-lowest/90 border border-outline-variant/30 text-xs space-y-1.5 mb-3">
+        <div class="flex items-center justify-between pb-1.5 border-b border-outline-variant/20">
+          <div>
+            <span class="text-[10px] text-on-surface-variant uppercase font-bold block">Estimated Arrival</span>
+            <span class="text-sm font-bold text-primary" id="track-eta">24-30 Minutes (Chilled at 4°C)</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold">
+            Fresh Squeeze
+          </span>
+        </div>
+        <div class="flex items-start justify-between text-[11px] pt-1">
+          <div>
+            <span class="text-on-surface-variant">🏪 <strong>Origin:</strong> Shiv Juice Center, Sonia Vihar 3rd Pusta, Delhi</span>
+            <p class="text-on-surface-variant mt-0.5" id="track-destination-text">📍 <strong>Deliver To:</strong> Customer Address</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-1 text-[11px] text-on-surface-variant">
+          <span>🛵 <strong>Rider:</strong> Amit Kumar (+91 98712 34567)</span>
+          <span class="text-secondary font-bold">Insulated Box #04</span>
+        </div>
+      </div>
+
+      <!-- Google Maps External Directions Link -->
+      <div class="flex flex-col sm:flex-row items-center gap-2">
+        <a id="track-gmaps-link" href="https://www.google.com/maps/dir/?api=1&origin=Sonia+Vihar+3rd+Pusta+Delhi&destination=Delhi" target="_blank" class="w-full sm:flex-1 py-2 px-4 rounded-full bg-surface-container hover:bg-surface-container-high text-primary text-xs font-bold text-center border border-primary/30 inline-flex items-center justify-center gap-1.5 transition-colors">
+          <span class="material-symbols-outlined text-[15px] text-secondary">open_in_new</span>
+          <span>Open Navigation in Google Maps</span>
+        </a>
+        <button type="button" onclick="closeTrackOrderModal()" class="w-full sm:w-auto px-5 py-2 rounded-full bg-primary text-white text-xs font-bold">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- USER / CUSTOMER PROFILE SECTION MODAL                             -->
+  <!-- ================================================================= -->
+  <div id="user-profile-modal-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 transition-all duration-300">
+    <div id="user-profile-modal-card" class="bg-surface/95 backdrop-blur-2xl rounded-3xl p-5 sm:p-7 max-w-xl w-full border-2 border-primary/40 shadow-2xl relative transform transition-all scale-95 opacity-0 duration-300 max-h-[92vh] overflow-y-auto flex flex-col gap-4">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shadow-inner">
+            <span class="material-symbols-outlined text-2xl text-secondary">account_circle</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h3 class="font-headline-sm text-lg sm:text-xl text-primary font-bold">Customer Profile</h3>
+              <span id="profile-badge-status" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9.5px] font-bold">1-Click Ready</span>
+            </div>
+            <p class="text-[10.5px] text-on-surface-variant font-medium">Save basic details for 1-click checkout &amp; fast delivery across Delhi</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeUserProfileModal()" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors font-bold text-xs" title="Close">
+          ✕
+        </button>
+      </div>
+
+      <!-- Navigation Tabs: Basic Profile vs Order History -->
+      <div class="flex items-center gap-2 p-1 bg-surface-container rounded-2xl border border-primary/15">
+        <button type="button" id="tab-btn-profile-details" onclick="switchProfileTab('details')" class="flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all bg-primary text-white shadow-sm flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">badge</span>
+          <span>Basic Details &amp; Address</span>
+        </button>
+        <button type="button" id="tab-btn-profile-orders" onclick="switchProfileTab('orders')" class="flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:text-primary flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">receipt_long</span>
+          <span>My Orders</span>
+          <span id="profile-orders-count-badge" class="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary text-[9px] font-bold">0</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: BASIC PROFILE DETAILS FORM -->
+      <form id="profile-form" onsubmit="handleProfileSave(event)" class="space-y-3">
+        <!-- Notice bar -->
+        <div class="p-2.5 rounded-2xl bg-surface-container-low border border-primary/20 text-[11px] text-on-surface-variant flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base text-secondary">bolt</span>
+            <span>These details automatically pre-fill your checkout form.</span>
+          </div>
+          <span class="text-[9.5px] font-bold text-primary bg-white px-2 py-0.5 rounded-full border border-primary/20">Auto-Synced</span>
+        </div>
+
+        <!-- Name & Mobile -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Full Name *</label>
+            <input type="text" id="profile-input-name" required placeholder="e.g. Shiv Jha" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Mobile Number (10 Digits) *</label>
+            <div class="flex">
+              <span class="inline-flex items-center px-2.5 rounded-l-xl bg-surface-container text-xs text-on-surface-variant font-bold border border-r-0 border-outline-variant/40">+91</span>
+              <input type="tel" id="profile-input-mobile" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" class="w-full px-3 py-1.5 rounded-r-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-[11px] font-bold text-primary mb-1">Email Address (For Invoices &amp; Tracking)</label>
+          <input type="email" id="profile-input-email" placeholder="e.g. shiv@gmail.com" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+        </div>
+
+        <!-- Locality Selector -->
+        <div>
+          <label class="block text-[11px] font-bold text-primary mb-1">Delhi Delivery Locality</label>
+          <select id="profile-input-locality" onchange="onProfileLocalitySelect(this.value)" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface font-medium focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40">
+            <!-- Locality options populated via JS -->
+          </select>
+        </div>
+
+        <!-- House / Street -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Flat / House / Shop No. *</label>
+            <input type="text" id="profile-input-flat" required placeholder="e.g. House 12 / Shop 3" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Street / Gali / Colony *</label>
+            <input type="text" id="profile-input-street" required placeholder="e.g. Main Pusta Road" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+        </div>
+
+        <!-- Landmark & PIN -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Landmark (Optional)</label>
+            <input type="text" id="profile-input-landmark" placeholder="e.g. Near Shiv Mandir" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">PIN Code (Delhi 110xxx) *</label>
+            <input type="text" id="profile-input-pincode" value="110094" required pattern="110[0-9]{3}" maxlength="6" class="w-full px-3 py-1.5 rounded-xl bg-surface-container-lowest text-xs text-on-surface font-semibold focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" />
+          </div>
+        </div>
+
+        <!-- City & State -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">City</label>
+            <input type="text" id="profile-input-city" value="Delhi (NCT)" readonly class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low text-xs text-on-surface font-semibold border border-outline-variant/40 cursor-not-allowed" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">State</label>
+            <input type="text" id="profile-input-state" value="Delhi" readonly class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low text-xs text-on-surface font-semibold border border-outline-variant/40 cursor-not-allowed" />
+          </div>
+        </div>
+
+        <!-- Address Type & Preferred Payment -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Default Address Type</label>
+            <div class="flex gap-2">
+              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="profileAddressType" value="Home" checked class="text-primary"/>
+                <span>🏠 Home</span>
+              </label>
+              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="profileAddressType" value="Office" class="text-primary"/>
+                <span>🏢 Office</span>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-primary mb-1">Preferred Payment</label>
+            <div class="flex gap-2">
+              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="profilePaymentMethod" value="Cash on Delivery" class="text-primary"/>
+                <span>💵 Cash</span>
+              </label>
+              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
+                <input type="radio" name="profilePaymentMethod" value="Razorpay" checked class="text-primary"/>
+                <span>💳 Online</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Toast / Status Feedback -->
+        <div id="profile-save-status" class="hidden p-2.5 rounded-xl text-center text-xs font-bold"></div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-outline-variant/30">
+          <button type="button" onclick="closeUserProfileModal()" class="px-5 py-2 rounded-full bg-surface-container hover:bg-surface-container-high text-primary text-xs font-bold transition-all border border-outline-variant/40">
+            Cancel
+          </button>
+          <button type="submit" id="profile-save-btn" class="px-6 py-2 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-lg hover:-translate-y-0.5 inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span>Save Profile</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- TAB 2: MY ORDERS LIST -->
+      <div id="profile-orders-section" class="hidden flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-primary">Recent Orders for this Number:</span>
+          <button type="button" onclick="refreshUserOrders()" class="text-[11px] text-secondary font-bold hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">refresh</span>
+            <span>Refresh</span>
+          </button>
+        </div>
+        <div id="profile-orders-list" class="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+          <!-- Populated by JS -->
+          <div class="p-6 text-center text-on-surface-variant text-xs">
+            Loading your orders...
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Interactive Order Modal, Auth & Live Tracking Logic -->
+  <script>
+    let activeJuice = 'Classic Damascus Rose Milk';
+    let activePrice = 75;
+    let activeQty = 1;
+    let lastOrderData = null;
+    let leafletMapInstance = null;
+    let riderMarker = null;
+    let routeAnimationTimer = null;
+    let currentAuthMobile = null;
+
+    // SONIA VIHAR 3RD PUSTA DELHI COORDINATES (Production & Dispatch Hub)
+    const SONIA_VIHAR_COORDS = [28.7235, 77.2589];
+
+    // DELHI LOCALITY DIRECTORY (Google Maps Coordinates, PIN Codes, & ETA from Sonia Vihar)
+    const DELHI_LOCALITIES = {
+      "Sonia Vihar 3rd Pusta": { coords: [28.7235, 77.2589], pin: "110094", eta: "10-15 Mins", dist: "0.5 km", zone: "Hub Store" },
+      "Sonia Vihar (1st-5th Pusta)": { coords: [28.7290, 77.2560], pin: "110094", eta: "10-15 Mins", dist: "1.2 km", zone: "North East Delhi" },
+      "Khajuri Khas": { coords: [28.7050, 77.2680], pin: "110094", eta: "12-18 Mins", dist: "3.0 km", zone: "North East Delhi" },
+      "Bhajanpura": { coords: [28.7000, 77.2650], pin: "110053", eta: "15-20 Mins", dist: "3.8 km", zone: "North East Delhi" },
+      "Yamuna Vihar": { coords: [28.6975, 77.2750], pin: "110053", eta: "15-22 Mins", dist: "4.5 km", zone: "North East Delhi" },
+      "Karawal Nagar": { coords: [28.7300, 77.2760], pin: "110094", eta: "15-22 Mins", dist: "3.5 km", zone: "North East Delhi" },
+      "Wazirabad": { coords: [28.7090, 77.2310], pin: "110054", eta: "15-22 Mins", dist: "4.2 km", zone: "North Delhi" },
+      "Timarpur": { coords: [28.7000, 77.2250], pin: "110054", eta: "18-25 Mins", dist: "5.5 km", zone: "North Delhi" },
+      "Civil Lines": { coords: [28.6820, 77.2220], pin: "110054", eta: "20-28 Mins", dist: "7.0 km", zone: "North Delhi" },
+      "Delhi University North Campus": { coords: [28.6890, 77.2100], pin: "110009", eta: "20-28 Mins", dist: "7.8 km", zone: "North Delhi" },
+      "Kashmere Gate": { coords: [28.6675, 77.2285], pin: "110006", eta: "22-30 Mins", dist: "8.5 km", zone: "Central Delhi" },
+      "Chandni Chowk": { coords: [28.6560, 77.2300], pin: "110006", eta: "25-35 Mins", dist: "9.8 km", zone: "Central Delhi" },
+      "Connaught Place": { coords: [28.6315, 77.2167], pin: "110001", eta: "25-35 Mins", dist: "12.5 km", zone: "Central Delhi" },
+      "Karol Bagh": { coords: [28.6520, 77.1900], pin: "110005", eta: "30-40 Mins", dist: "13.0 km", zone: "Central Delhi" },
+      "Model Town": { coords: [28.7020, 77.1930], pin: "110009", eta: "25-35 Mins", dist: "9.2 km", zone: "North Delhi" },
+      "Shahdara": { coords: [28.6730, 77.2880], pin: "110032", eta: "20-30 Mins", dist: "7.5 km", zone: "East Delhi" },
+      "Seelampur": { coords: [28.6690, 77.2720], pin: "110053", eta: "18-28 Mins", dist: "6.8 km", zone: "East Delhi" },
+      "Dilshad Garden": { coords: [28.6830, 77.3150], pin: "110095", eta: "25-35 Mins", dist: "9.5 km", zone: "East Delhi" },
+      "Laxmi Nagar": { coords: [28.6300, 77.2770], pin: "110092", eta: "25-35 Mins", dist: "11.0 km", zone: "East Delhi" },
+      "Preet Vihar": { coords: [28.6380, 77.2950], pin: "110092", eta: "25-35 Mins", dist: "11.5 km", zone: "East Delhi" },
+      "Mayur Vihar": { coords: [28.6080, 77.2980], pin: "110091", eta: "30-42 Mins", dist: "15.0 km", zone: "East Delhi" },
+      "Anand Vihar": { coords: [28.6465, 77.3150], pin: "110092", eta: "28-38 Mins", dist: "12.8 km", zone: "East Delhi" },
+      "Pitampura": { coords: [28.6990, 77.1500], pin: "110034", eta: "30-42 Mins", dist: "14.5 km", zone: "North-West Delhi" },
+      "Rohini": { coords: [28.7150, 77.1150], pin: "110085", eta: "35-45 Mins", dist: "16.0 km", zone: "North-West Delhi" },
+      "Shalimar Bagh": { coords: [28.7100, 77.1650], pin: "110088", eta: "30-40 Mins", dist: "12.5 km", zone: "North-West Delhi" },
+      "Rajouri Garden": { coords: [28.6450, 77.1200], pin: "110027", eta: "35-50 Mins", dist: "18.0 km", zone: "West Delhi" },
+      "Janakpuri": { coords: [28.6250, 77.0850], pin: "110058", eta: "40-55 Mins", dist: "22.0 km", zone: "West Delhi" },
+      "Dwarka": { coords: [28.5800, 77.0500], pin: "110075", eta: "45-60 Mins", dist: "26.0 km", zone: "South-West Delhi" },
+      "Lajpat Nagar": { coords: [28.5700, 77.2400], pin: "110024", eta: "35-48 Mins", dist: "18.5 km", zone: "South Delhi" },
+      "Defence Colony": { coords: [28.5730, 77.2300], pin: "110024", eta: "35-50 Mins", dist: "18.0 km", zone: "South Delhi" },
+      "Hauz Khas": { coords: [28.5490, 77.2000], pin: "110016", eta: "40-55 Mins", dist: "21.0 km", zone: "South Delhi" },
+      "Saket": { coords: [28.5250, 77.2150], pin: "110017", eta: "42-55 Mins", dist: "23.0 km", zone: "South Delhi" },
+      "Nehru Place": { coords: [28.5480, 77.2500], pin: "110019", eta: "38-50 Mins", dist: "20.0 km", zone: "South Delhi" },
+      "Greater Kailash": { coords: [28.5350, 77.2400], pin: "110048", eta: "40-52 Mins", dist: "21.5 km", zone: "South Delhi" },
+      "Vasant Kunj": { coords: [28.5200, 77.1500], pin: "110070", eta: "45-60 Mins", dist: "25.0 km", zone: "South-West Delhi" },
+      "Other Delhi Locality": { coords: [28.6812, 77.2227], pin: "110094", eta: "25-40 Mins", dist: "10.0 km", zone: "Delhi Area" }
+    };
+
+    // =================================================================
+    // CUSTOMER PROFILE CONTROLLER & 1-CLICK AUTO-FILL LOGIC
+    // =================================================================
+    function getSavedUserProfile() {
+      try {
+        const stored = localStorage.getItem('sjc_user_profile');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {}
+      const auth = getLoggedInUser();
+      if (auth) {
+        return {
+          name: auth.name && !auth.name.startsWith('Customer') ? auth.name : '',
+          mobile: auth.mobile || '',
+          email: auth.email && !auth.email.includes('@customer.shivjuice.com') ? auth.email : '',
+          delhiLocality: 'Sonia Vihar 3rd Pusta',
+          pincode: '110094'
+        };
+      }
+      return null;
+    }
+
+    function populateProfileLocalities() {
+      const select = document.getElementById('profile-input-locality');
+      if (!select || select.children.length > 0) return;
+      const checkoutSelect = document.getElementById('form-delhi-locality');
+      if (checkoutSelect) {
+        select.innerHTML = checkoutSelect.innerHTML;
+      }
+    }
+
+    function onProfileLocalitySelect(localityName) {
+      const entry = DELHI_LOCALITIES[localityName] || DELHI_LOCALITIES["Other Delhi Locality"];
+      const pinInput = document.getElementById('profile-input-pincode');
+      if (pinInput && entry && entry.pin) {
+        pinInput.value = entry.pin;
+      }
+    }
+
+    function openUserProfileModal() {
+      populateProfileLocalities();
+      loadUserProfileIntoForm();
+      switchProfileTab('details');
+
+      const backdrop = document.getElementById('user-profile-modal-backdrop');
+      const card = document.getElementById('user-profile-modal-card');
+      backdrop.classList.remove('hidden');
+      backdrop.classList.add('flex');
+
+      setTimeout(() => {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
+
+    function closeUserProfileModal() {
+      const backdrop = document.getElementById('user-profile-modal-backdrop');
+      const card = document.getElementById('user-profile-modal-card');
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+
+      setTimeout(() => {
+        backdrop.classList.add('hidden');
+        backdrop.classList.remove('flex');
+      }, 250);
+    }
+
+    function switchProfileTab(tabName) {
+      const btnDetails = document.getElementById('tab-btn-profile-details');
+      const btnOrders = document.getElementById('tab-btn-profile-orders');
+      const formDetails = document.getElementById('profile-form');
+      const secOrders = document.getElementById('profile-orders-section');
+
+      if (tabName === 'details') {
+        btnDetails.className = 'flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all bg-primary text-white shadow-sm flex items-center justify-center gap-1.5';
+        btnOrders.className = 'flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:text-primary flex items-center justify-center gap-1.5';
+        formDetails.classList.remove('hidden');
+        secOrders.classList.add('hidden');
+        secOrders.classList.remove('flex');
+      } else {
+        btnOrders.className = 'flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all bg-primary text-white shadow-sm flex items-center justify-center gap-1.5';
+        btnDetails.className = 'flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:text-primary flex items-center justify-center gap-1.5';
+        formDetails.classList.add('hidden');
+        secOrders.classList.remove('hidden');
+        secOrders.classList.add('flex');
+        loadUserOrders();
+      }
+    }
+
+    function loadUserProfileIntoForm() {
+      const profile = getSavedUserProfile();
+      const statusDiv = document.getElementById('profile-save-status');
+      if (statusDiv) statusDiv.classList.add('hidden');
+
+      if (!profile) return;
+
+      if (profile.name) document.getElementById('profile-input-name').value = profile.name;
+      if (profile.mobile) document.getElementById('profile-input-mobile').value = profile.mobile;
+      if (profile.email) document.getElementById('profile-input-email').value = profile.email;
+      if (profile.delhiLocality) document.getElementById('profile-input-locality').value = profile.delhiLocality;
+      if (profile.flatHouse) document.getElementById('profile-input-flat').value = profile.flatHouse;
+      if (profile.areaStreet) document.getElementById('profile-input-street').value = profile.areaStreet;
+      if (profile.landmark) document.getElementById('profile-input-landmark').value = profile.landmark;
+      if (profile.pincode) document.getElementById('profile-input-pincode').value = profile.pincode;
+
+      if (profile.addressType) {
+        const rad = document.querySelector(`input[name="profileAddressType"][value="${profile.addressType}"]`);
+        if (rad) rad.checked = true;
+      }
+      if (profile.paymentMethod || profile.preferredPayment) {
+        const rad = document.querySelector(`input[name="profilePaymentMethod"][value="${profile.paymentMethod || profile.preferredPayment}"]`);
+        if (rad) rad.checked = true;
+      }
+    }
+
+    async function handleProfileSave(event) {
+      if (event) event.preventDefault();
+      const name = document.getElementById('profile-input-name').value.trim();
+      const mobile = document.getElementById('profile-input-mobile').value.trim();
+      const email = document.getElementById('profile-input-email').value.trim();
+      const delhiLocality = document.getElementById('profile-input-locality').value || 'Sonia Vihar 3rd Pusta';
+      const flatHouse = document.getElementById('profile-input-flat').value.trim();
+      const areaStreet = document.getElementById('profile-input-street').value.trim();
+      const landmark = document.getElementById('profile-input-landmark').value.trim();
+      const pincode = document.getElementById('profile-input-pincode').value.trim();
+      const addressType = document.querySelector('input[name="profileAddressType"]:checked')?.value || 'Home';
+      const preferredPayment = document.querySelector('input[name="profilePaymentMethod"]:checked')?.value || 'Razorpay';
+
+      if (!mobile || !/^\d{10}$/.test(mobile)) {
+        alert('Please enter a valid 10-digit mobile number.');
+        document.getElementById('profile-input-mobile').focus();
+        return;
+      }
+
+      const profileData = {
+        name,
+        mobile,
+        email,
+        delhiLocality,
+        flatHouse,
+        areaStreet,
+        landmark,
+        pincode,
+        city: 'Delhi (NCT)',
+        state: 'Delhi',
+        addressType,
+        preferredPayment,
+        updatedAt: new Date().toISOString()
+      };
+
+      // 1. Save in LocalStorage
+      localStorage.setItem('sjc_user_profile', JSON.stringify(profileData));
+
+      // Update auth session
+      const auth = getLoggedInUser() || {};
+      auth.name = name;
+      auth.mobile = mobile;
+      if (email) auth.email = email;
+      localStorage.setItem('sjc_auth_user', JSON.stringify(auth));
+      checkLoginState();
+
+      // 2. Persist to server backend
+      const btn = document.getElementById('profile-save-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span> Saving...';
+
+      try {
+        await fetch('/api/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profileData)
+        });
+        
+        const statusDiv = document.getElementById('profile-save-status');
+        if (statusDiv) {
+          statusDiv.innerText = '✅ Profile details saved successfully! Auto-fill active.';
+          statusDiv.className = 'p-2.5 rounded-xl text-center text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 block';
+        }
+      } catch (err) {
+        console.error('Profile save error:', err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">save</span> <span>Save Profile</span>';
+      }
+    }
+
+    async function loadUserOrders() {
+      const listEl = document.getElementById('profile-orders-list');
+      const countBadge = document.getElementById('profile-orders-count-badge');
+      const profile = getSavedUserProfile();
+      const mobile = profile ? profile.mobile : (getLoggedInUser()?.mobile || '');
+
+      if (!mobile) {
+        listEl.innerHTML = `
+          <div class="p-6 text-center text-on-surface-variant text-xs bg-surface-container-low rounded-2xl border border-primary/20">
+            Please enter your mobile number in the profile tab to see your past orders.
+          </div>
+        `;
+        if (countBadge) countBadge.innerText = '0';
+        return;
+      }
+
+      listEl.innerHTML = `<div class="p-6 text-center text-xs text-on-surface-variant">Searching orders for +91 ${mobile}...</div>`;
+
+      try {
+        const res = await fetch('/api/user-orders?mobile=' + encodeURIComponent(mobile));
+        const data = await res.json();
+        const orders = data.orders || [];
+
+        if (countBadge) countBadge.innerText = orders.length;
+
+        if (orders.length === 0) {
+          listEl.innerHTML = `
+            <div class="p-6 text-center text-on-surface-variant text-xs bg-surface-container-low rounded-2xl border border-primary/20 flex flex-col items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-secondary">shopping_bag</span>
+              <span>No past orders placed under +91 ${mobile} yet.</span>
+              <button onclick="closeUserProfileModal(); openOrderModal('Classic Damascus Rose Milk', 75);" class="mt-1 px-4 py-1.5 rounded-full bg-primary text-white text-xs font-bold shadow-sm">
+                Order Damascus Rose Milk Now
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        listEl.innerHTML = orders.map(o => {
+          const isPaid = (o.paymentStatus === 'PAID');
+          const statusBg = isPaid ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-amber-100 text-amber-800 border-amber-200';
+          const statusLabel = isPaid ? 'PAID • Verified' : (o.paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : 'Pending');
+          const orderDate = new Date(o.createdTimestamp || o.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+          return `
+            <div class="p-3 rounded-2xl bg-surface-container-low border border-primary/20 flex items-center justify-between gap-2 shadow-sm">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-bold text-primary text-xs">#${o.orderId}</span>
+                  <span class="px-2 py-0.2 rounded-full text-[9px] font-bold border ${statusBg}">${statusLabel}</span>
+                  <span class="text-[10px] text-on-surface-variant">${orderDate}</span>
+                </div>
+                <div class="text-xs font-semibold text-on-surface truncate">${o.juiceItem || 'Classic Damascus Rose Milk'} (x${o.quantity || 1})</div>
+                <div class="text-[10.5px] text-on-surface-variant truncate">📍 ${o.address || o.delhiLocality}</div>
+              </div>
+              <div class="text-right shrink-0 flex flex-col items-end gap-1.5">
+                <span class="font-headline-md font-bold text-sm text-primary">₹${o.finalAmount || o.total}</span>
+                <button type="button" onclick="closeUserProfileModal(); openTrackOrderModal('${o.orderId}');" class="px-2.5 py-1 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-white text-[10px] font-bold transition-all border border-primary/20 flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-[12px]">local_shipping</span>
+                  <span>Track</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        listEl.innerHTML = `<div class="p-4 text-center text-xs text-red-600">Error fetching orders: ${err.message}</div>`;
+      }
+    }
+
+    function refreshUserOrders() {
+      loadUserOrders();
+    }
+
+    function saveCustomerProfileFromCheckout(data) {
+      try {
+        const existing = getSavedUserProfile() || {};
+        const merged = { ...existing, ...data, updatedAt: new Date().toISOString() };
+        localStorage.setItem('sjc_user_profile', JSON.stringify(merged));
+        fetch('/api/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(merged)
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    // =================================================================
+    // AUTHENTICATION & LOGIN GATEWAY CONTROLLER
+    // =================================================================
+    function getLoggedInUser() {
+      try {
+        const u = localStorage.getItem('sjc_auth_user') || sessionStorage.getItem('sjc_auth_user');
+        return u ? JSON.parse(u) : null;
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function checkLoginState() {
+      const user = getLoggedInUser();
+      const gateway = document.getElementById('login-gateway-screen');
+      const userBadge = document.getElementById('nav-user-badge');
+      const userName = document.getElementById('nav-user-name');
+      const userAvatar = document.getElementById('nav-user-avatar');
+      const savedProfile = getSavedUserProfile();
+
+      if (user || savedProfile) {
+        // Hide Login Gateway Screen with smooth transition
+        gateway.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+        setTimeout(() => gateway.classList.add('hidden'), 400);
+
+        // Show Logged-in User Badge in Navbar
+        if (userBadge) {
+          userBadge.classList.remove('hidden');
+          userBadge.classList.add('flex');
+        }
+        const displayName = (savedProfile && savedProfile.name) ? savedProfile.name : (user ? (user.name || 'User') : 'User');
+        if (userName) userName.innerText = displayName;
+        if (userAvatar) {
+          if (user && user.picture) {
+            userAvatar.innerHTML = `<img src="${user.picture}" class="w-full h-full rounded-full object-cover"/>`;
+          } else {
+            userAvatar.innerText = displayName.charAt(0).toUpperCase();
+          }
+        }
+      } else {
+        // Show Login Gateway Screen
+        gateway.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'scale-95');
+        gateway.classList.add('flex', 'opacity-100');
+        if (userBadge) userBadge.classList.add('hidden');
+      }
+    }
+
+    // SECTION 1: MOBILE & OTP API LOGIC (BACKEND VERIFIED)
+    let resendTimer = null;
+    let resendCooldown = 30;
+
+    function startResendCooldown() {
+      const btn = document.getElementById('btn-resend-otp');
+      const cdSpan = document.getElementById('resend-countdown');
+      if (!btn || !cdSpan) return;
+      clearInterval(resendTimer);
+      resendCooldown = 30;
+      btn.disabled = true;
+      btn.innerHTML = 'Resend OTP in <span id="resend-countdown">' + resendCooldown + '</span>s';
+
+      resendTimer = setInterval(() => {
+        resendCooldown--;
+        const currentSpan = document.getElementById('resend-countdown');
+        if (currentSpan) currentSpan.innerText = resendCooldown;
+        if (resendCooldown <= 0) {
+          clearInterval(resendTimer);
+          btn.disabled = false;
+          btn.innerHTML = '🔄 Resend OTP';
+        }
+      }, 1000);
+    }
+
+    async function handleSendOtp() {
+      const mobileInput = document.getElementById('login-mobile-input');
+      const mobile = (mobileInput.value || '').trim();
+      const btn = document.getElementById('btn-send-otp');
+      const btnText = document.getElementById('btn-send-otp-text');
+
+      if (!mobile || !/^\d{10}$/.test(mobile)) {
+        alert('Please enter a valid 10-digit mobile number.');
+        mobileInput.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = 'Dispatching SMS to Message Box...';
+
+      try {
+        const res = await fetch('/api/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          currentAuthMobile = mobile;
+
+          document.getElementById('otp-step-mobile').classList.add('hidden');
+          const verifyStep = document.getElementById('otp-step-verify');
+          verifyStep.classList.remove('hidden');
+          verifyStep.classList.add('flex');
+
+          document.getElementById('verify-mobile-label').innerText = '+91 ' + mobile;
+          const otpInput = document.getElementById('login-otp-input');
+          otpInput.value = '';
+          otpInput.focus();
+
+          const errorDiv = document.getElementById('otp-error-msg');
+          if (errorDiv) {
+            errorDiv.classList.add('hidden');
+            errorDiv.innerText = '';
+          }
+
+          startResendCooldown();
+        } else {
+          alert(data.message || 'Could not send SMS OTP. Please check the mobile number.');
+        }
+      } catch (err) {
+        console.error('OTP error:', err);
+        alert('Could not connect to server. Please verify backend is running.');
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'Send OTP to Mobile Message Box';
+      }
+    }
+
+    async function handleResendOtp() {
+      const mobile = currentAuthMobile || (document.getElementById('login-mobile-input').value || '').trim();
+      if (!mobile) return;
+      const btn = document.getElementById('btn-resend-otp');
+      btn.disabled = true;
+      btn.innerText = 'Sending...';
+
+      try {
+        const res = await fetch('/api/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile })
+        });
+        const data = await res.json();
+        if (data.success) {
+          startResendCooldown();
+          const errorDiv = document.getElementById('otp-error-msg');
+          if (errorDiv) {
+            errorDiv.innerText = data.message || 'New OTP dispatched to your mobile message box.';
+            errorDiv.className = 'text-[11px] font-semibold text-center py-0.5 text-emerald-700';
+            errorDiv.classList.remove('hidden');
+          }
+        } else {
+          alert(data.message || 'Could not resend OTP.');
+          btn.disabled = false;
+        }
+      } catch (err) {
+        btn.disabled = false;
+        alert('Server error while resending OTP.');
+      }
+    }
+
+    function resetOtpStep() {
+      clearInterval(resendTimer);
+      document.getElementById('otp-step-verify').classList.add('hidden');
+      document.getElementById('otp-step-mobile').classList.remove('hidden');
+      document.getElementById('login-mobile-input').focus();
+    }
+
+    async function handleVerifyOtp() {
+      const otpInput = document.getElementById('login-otp-input');
+      const otp = (otpInput.value || '').trim();
+      const mobile = currentAuthMobile || document.getElementById('login-mobile-input').value.trim();
+      const btn = document.getElementById('btn-verify-otp');
+      const btnText = document.getElementById('btn-verify-otp-text');
+      const errorDiv = document.getElementById('otp-error-msg');
+
+      if (errorDiv) errorDiv.classList.add('hidden');
+
+      if (!otp || !/^\d{6}$/.test(otp)) {
+        if (errorDiv) {
+          errorDiv.innerText = 'Please enter the complete 6-digit OTP received via SMS.';
+          errorDiv.className = 'text-[11px] font-semibold text-center py-0.5 text-red-600';
+          errorDiv.classList.remove('hidden');
+        } else {
+          alert('Please enter the complete 6-digit OTP received via SMS.');
+        }
+        otpInput.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = 'Verifying with Server...';
+
+      try {
+        const res = await fetch('/api/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile, otp })
+        });
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          localStorage.setItem('sjc_auth_user', JSON.stringify(data.user));
+          checkLoginState();
+        } else {
+          if (errorDiv) {
+            errorDiv.innerText = data.message || 'Incorrect OTP. Server verification failed.';
+            errorDiv.className = 'text-[11px] font-semibold text-center py-0.5 text-red-600';
+            errorDiv.classList.remove('hidden');
+          } else {
+            alert(data.message || 'Incorrect OTP. Server verification failed.');
+          }
+          otpInput.select();
+        }
+      } catch (err) {
+        console.error('Verify error:', err);
+        if (errorDiv) {
+          errorDiv.innerText = 'Connection error with backend server.';
+          errorDiv.className = 'text-[11px] font-semibold text-center py-0.5 text-red-600';
+          errorDiv.classList.remove('hidden');
+        } else {
+          alert('Connection error with backend server.');
+        }
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'Verify via Server & Enter Website';
+      }
+    }
+
+
+    function handleLogout() {
+      if (confirm('Are you sure you want to log out from Shiv Juice Center?')) {
+        localStorage.removeItem('sjc_auth_user');
+        sessionStorage.removeItem('sjc_auth_user');
+        checkLoginState();
+      }
+    }
+
+    // Call checkLoginState immediately on load
+    document.addEventListener('DOMContentLoaded', checkLoginState);
+    setTimeout(checkLoginState, 100);
+
+    function onDelhiLocalitySelect(localityName) {
+      const entry = DELHI_LOCALITIES[localityName] || DELHI_LOCALITIES["Other Delhi Locality"];
+      const pinInput = document.getElementById('form-pincode');
+      const etaBadge = document.getElementById('locality-eta-badge');
+      if (pinInput && entry.pin) pinInput.value = entry.pin;
+      if (etaBadge) {
+        etaBadge.innerText = `${entry.eta} (${entry.dist})`;
+      }
+    }
+
+    let activePaymentOrder = null;
+    let paymentPollInterval = null;
+
+    function stopPaymentPolling() {
+      if (paymentPollInterval) {
+        clearInterval(paymentPollInterval);
+        paymentPollInterval = null;
+      }
+    }
+
+    function openOrderModal(juiceName, price) {
+      activeJuice = juiceName;
+      activePrice = price;
+      activeQty = 1;
+
+      document.getElementById('modal-juice-title').innerText = activeJuice;
+      document.getElementById('modal-juice-rate').innerText = '₹' + activePrice + ' / unit • Dispatched from Sonia Vihar';
+      document.getElementById('modal-qty').innerText = activeQty;
+      document.getElementById('modal-total-price').innerText = '₹' + (activePrice * activeQty);
+
+      // Pre-populate fields from saved customer profile or authenticated user session
+      const profile = getSavedUserProfile();
+      const user = getLoggedInUser();
+
+      const profileName = profile?.name || (user?.name && !user.name.startsWith('Customer') ? user.name : '');
+      const profileMobile = profile?.mobile || user?.mobile || '';
+      const profileEmail = profile?.email || (user?.email && !user.email.includes('@customer.shivjuice.com') ? user.email : '');
+
+      if (profileName && !document.getElementById('form-name').value) {
+        document.getElementById('form-name').value = profileName;
+      }
+      if (profileMobile && !document.getElementById('form-mobile').value) {
+        document.getElementById('form-mobile').value = profileMobile;
+      }
+      if (profileEmail && !document.getElementById('form-email').value) {
+        document.getElementById('form-email').value = profileEmail;
+      }
+      if (profile?.delhiLocality) {
+        const locSelect = document.getElementById('form-delhi-locality');
+        if (locSelect) {
+          locSelect.value = profile.delhiLocality;
+          onDelhiLocalitySelect(profile.delhiLocality);
+        }
+      }
+      if (profile?.flatHouse && !document.getElementById('form-flat').value) {
+        document.getElementById('form-flat').value = profile.flatHouse;
+      }
+      if (profile?.areaStreet && !document.getElementById('form-street').value) {
+        document.getElementById('form-street').value = profile.areaStreet;
+      }
+      if (profile?.landmark && !document.getElementById('form-landmark').value) {
+        document.getElementById('form-landmark').value = profile.landmark;
+      }
+      if (profile?.pincode && !document.getElementById('form-pincode').value) {
+        document.getElementById('form-pincode').value = profile.pincode;
+      }
+      if (profile?.addressType) {
+        const rad = document.querySelector(`input[name="addressType"][value="${profile.addressType}"]`);
+        if (rad) rad.checked = true;
+      }
+      if (profile?.preferredPayment) {
+        const rad = document.querySelector(`input[name="paymentMethod"][value="${profile.preferredPayment}"]`);
+        if (rad) rad.checked = true;
+      }
+
+      const notice = document.getElementById('checkout-profile-notice');
+      const noticeText = document.getElementById('checkout-profile-notice-text');
+      if (profile && (profile.flatHouse || profile.name)) {
+        if (notice) {
+          notice.classList.remove('hidden');
+          notice.classList.add('flex');
+        }
+        if (noticeText) noticeText.innerText = `Pre-filled from your profile (${profileName || profileMobile})`;
+      } else {
+        if (notice) notice.classList.add('hidden');
+      }
+
+      stopPaymentPolling();
+      document.getElementById('order-details-form').classList.remove('hidden');
+      document.getElementById('upi-payment-section')?.classList.add('hidden');
+      document.getElementById('order-success-screen').classList.add('hidden');
+
+      const backdrop = document.getElementById('order-modal-backdrop');
+      const card = document.getElementById('order-modal-card');
+      
+      backdrop.classList.remove('hidden');
+      backdrop.classList.add('flex');
+
+      setTimeout(() => {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
+
+    function openOrderModalFromTray() {
+      const packEl = document.getElementById('summary-pack').innerText;
+      const totalEl = document.getElementById('summary-total').innerText.replace('₹', '');
+      openOrderModal(packEl, parseInt(totalEl) || 215);
+    }
+
+    function closeOrderModal() {
+      stopPaymentPolling();
+      const backdrop = document.getElementById('order-modal-backdrop');
+      const card = document.getElementById('order-modal-card');
+      
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+
+      setTimeout(() => {
+        backdrop.classList.add('hidden');
+        backdrop.classList.remove('flex');
+      }, 250);
+    }
+
+    function adjustModalQty(delta) {
+      activeQty = Math.max(1, activeQty + delta);
+      document.getElementById('modal-qty').innerText = activeQty;
+      document.getElementById('modal-total-price').innerText = '₹' + (activePrice * activeQty);
+    }
+
+    async function handleOrderSubmit(event) {
+      event.preventDefault();
+
+      const submitBtn = document.getElementById('form-submit-btn');
+      submitBtn.disabled = true;
+
+      const localitySelect = document.getElementById('form-delhi-locality');
+      const delhiLocality = localitySelect ? localitySelect.value : 'Sonia Vihar 3rd Pusta';
+      const flatHouse = document.getElementById('form-flat').value.trim();
+      const areaStreet = document.getElementById('form-street').value.trim();
+      const landmark = document.getElementById('form-landmark').value.trim();
+      const pincode = document.getElementById('form-pincode').value.trim();
+      const customerEmail = document.getElementById('form-email').value.trim();
+      const customerName = document.getElementById('form-name').value.trim();
+      const customerMobile = document.getElementById('form-mobile').value.trim();
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'Cash on Delivery';
+
+      const fullAddress = `${flatHouse}, ${areaStreet}, ${delhiLocality}${landmark ? ', Near ' + landmark : ''}, Delhi - ${pincode}`;
+      const localityData = DELHI_LOCALITIES[delhiLocality] || DELHI_LOCALITIES["Other Delhi Locality"];
+
+      const orderPayload = {
+        name: customerName,
+        customerEmail: customerEmail,
+        mobile: customerMobile,
+        delhiLocality: delhiLocality,
+        flatHouse: flatHouse,
+        areaStreet: areaStreet,
+        landmark: landmark,
+        city: 'Delhi (NCT)',
+        state: 'Delhi',
+        pincode: pincode,
+        address: fullAddress,
+        coords: localityData.coords,
+        eta: localityData.eta,
+        dist: localityData.dist,
+        addressType: document.querySelector('input[name="addressType"]:checked')?.value || 'Home',
+        paymentMethod: paymentMethod,
+        productName: activeJuice,
+        juiceItem: activeJuice,
+        price: activePrice,
+        quantity: activeQty,
+        total: activePrice * activeQty,
+        shopOrigin: 'Shiv Juice Center, Sonia Vihar 3rd Pusta, Delhi - 110094',
+        targetEmail: 'kanhaiyapandat4@gmail.com',
+        notificationMessage: 'order are placed'
+      };
+
+      // Save or update profile if customer checked the box
+      if (document.getElementById('form-save-profile-checkbox')?.checked) {
+        saveCustomerProfileFromCheckout({
+          name: customerName,
+          mobile: customerMobile,
+          email: customerEmail,
+          delhiLocality: delhiLocality,
+          flatHouse: flatHouse,
+          areaStreet: areaStreet,
+          landmark: landmark,
+          pincode: pincode,
+          addressType: document.querySelector('input[name="addressType"]:checked')?.value || 'Home',
+          preferredPayment: paymentMethod
+        });
+      }
+
+      // ==========================================
+      // FLOW A: RAZORPAY / UPI PAYMENT GATEWAY (REAL SERVER-VERIFIED)
+      // ==========================================
+      if (paymentMethod === 'Razorpay' || paymentMethod === 'UPI') {
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin">refresh</span> Launching Razorpay Checkout...';
+
+        try {
+          const resp = await fetch('/api/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderPayload)
+          });
+          const result = await resp.json();
+
+          if (!result.success || !result.order_id) {
+            alert('Error creating Razorpay order: ' + (result.error || result.message || 'Please check credentials'));
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check_circle</span> Place Your Order';
+            return;
+          }
+
+          // Retain order details
+          orderPayload.orderId = result.orderId;
+          orderPayload.finalAmount = result.amountInRupees || (result.amount / 100);
+          orderPayload.paymentMethod = 'Razorpay';
+          activePaymentOrder = { ...orderPayload, ...result };
+          lastOrderData = orderPayload;
+
+          // Populate UPI Scanner screen & App buttons
+          const payableRupees = result.amountInRupees || (result.amount / 100);
+          const upiId = result.upiId || '8799779715@ptaxis';
+          const businessName = encodeURIComponent(result.businessName || 'Shiv Juice Center');
+          const noteText = encodeURIComponent('Order ' + result.orderId);
+
+          document.getElementById('upi-dynamic-amount').innerText = '₹' + payableRupees;
+          document.getElementById('upi-display-id').innerText = upiId;
+          document.getElementById('upi-qr-image').src = result.qrCodeUrl;
+          document.getElementById('upi-items-summary').innerText = `${result.breakdown ? result.breakdown.item : orderPayload.juiceItem} (${orderPayload.quantity} units) • ₹${payableRupees}`;
+          document.getElementById('upi-order-ref').innerText = 'Order #' + result.orderId;
+          document.getElementById('upi-error-banner').classList.add('hidden');
+          document.getElementById('upi-utr-input').value = '';
+
+          // Setup Deep Links for Mobile UPI Apps (Google Pay, PhonePe, Paytm, Any UPI)
+          const genericUpi = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${businessName}&am=${payableRupees}&cu=INR&tn=${noteText}`;
+          const gpayUri = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${businessName}&am=${payableRupees}&cu=INR&tn=${noteText}`;
+          const phonepeUri = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${businessName}&am=${payableRupees}&cu=INR&tn=${noteText}`;
+          const paytmUri = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${businessName}&am=${payableRupees}&cu=INR&tn=${noteText}`;
+
+          const gpayEl = document.getElementById('upi-app-gpay');
+          if (gpayEl) gpayEl.href = gpayUri;
+          const phonepeEl = document.getElementById('upi-app-phonepe');
+          if (phonepeEl) phonepeEl.href = phonepeUri;
+          const paytmEl = document.getElementById('upi-app-paytm');
+          if (paytmEl) paytmEl.href = paytmUri;
+          const anyEl = document.getElementById('upi-app-any');
+          if (anyEl) anyEl.href = genericUpi;
+
+          // Switch screen: Reveal Scanner, App buttons, and Razorpay action
+          document.getElementById('order-details-form').classList.add('hidden');
+          document.getElementById('upi-payment-section').classList.remove('hidden');
+          startPaymentPolling(result.orderId, payableRupees);
+
+          // Automatically trigger Razorpay Standard Checkout modal
+          if (window.Razorpay) {
+            setTimeout(() => {
+              launchRazorpayModal(result, orderPayload);
+            }, 300);
+          }
+        } catch (err) {
+          console.error('Payment initialization error:', err);
+          alert('Could not connect to payment gateway server. Please check connection and try again.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check_circle</span> Place Your Order';
+        }
+        return;
+      }
+
+      // ==========================================
+      // FLOW B: CASH ON DELIVERY (ORIGINAL ARCHITECTURE)
+      // ==========================================
+      submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin">refresh</span> Submitting & Sending Notifications...';
+
+      try {
+        const response = await fetch('/api/submit-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderPayload)
+        });
+
+        const result = await response.json();
+        const orderId = result.orderId || ('SJC-' + Math.floor(100000 + Math.random() * 900000));
+        orderPayload.orderId = orderId;
+        lastOrderData = orderPayload;
+
+        onPaymentSuccess(orderId, orderPayload.total, 'Cash on Delivery');
+      } catch (err) {
+        console.error('Submission error:', err);
+        const fallbackId = 'SJC-' + Math.floor(100000 + Math.random() * 900000);
+        orderPayload.orderId = fallbackId;
+        lastOrderData = orderPayload;
+        onPaymentSuccess(fallbackId, orderPayload.total, 'Cash on Delivery');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check_circle</span> Place Your Order';
+      }
+    }
+
+    // Launch Razorpay Standard Checkout Modal
+    function launchRazorpayModal(orderData, orderPayload) {
+      const options = {
+        key: orderData.key_id || orderData.razorpayKeyId,
+        amount: orderData.amount, // in paise
+        currency: orderData.currency || 'INR',
+        name: orderData.businessName || 'Shiv Juice Center',
+        description: `${orderPayload.juiceItem} (${orderPayload.quantity} units)`,
+        image: 'girl_drinking_shake.jpg',
+        order_id: orderData.order_id,
+        handler: async function (response) {
+          console.log('[Razorpay Modal Payment Success]', response);
+          const submitBtn = document.getElementById('form-submit-btn');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin">refresh</span> Verifying Signature...';
+          }
+
+          try {
+            const verifyResp = await fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                order_id: response.razorpay_order_id,
+                payment_id: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                orderId: orderPayload.orderId,
+                productName: orderPayload.productName || orderPayload.juiceItem || activeJuice,
+                juiceItem: orderPayload.juiceItem || orderPayload.productName || activeJuice
+              })
+            });
+
+            const verifyResult = await verifyResp.json();
+            if (verifyResult.success && verifyResult.status === 'PAID') {
+              onPaymentSuccess(orderPayload.orderId, orderData.amountInRupees || (orderData.amount / 100), 'Razorpay Online');
+            } else {
+              alert('Payment Verification Failed: ' + (verifyResult.message || 'Signature mismatch. Order not confirmed.'));
+            }
+          } catch (e) {
+            console.error('Verification error:', e);
+            alert('Error verifying payment with server. Please contact support.');
+          } finally {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check_circle</span> Place Your Order';
+            }
+          }
+        },
+        prefill: {
+          name: orderPayload.name,
+          email: orderPayload.customerEmail,
+          contact: orderPayload.mobile
+        },
+        notes: {
+          orderId: orderPayload.orderId,
+          shopOrigin: 'Shiv Juice Center, Sonia Vihar 3rd Pusta, Delhi - 110094'
+        },
+        theme: {
+          color: '#880e4f'
+        },
+        modal: {
+          ondismiss: function () {
+            console.log('[Razorpay Modal Dismissed by Customer]');
+            // Switch to UPI Scanner section as alternative so user can scan or retry
+            document.getElementById('order-details-form').classList.add('hidden');
+            document.getElementById('upi-payment-section').classList.remove('hidden');
+            startPaymentPolling(orderPayload.orderId, orderData.amountInRupees || (orderData.amount / 100));
+          }
+        }
+      };
+
+      try {
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          console.error('[Razorpay Payment Failed]', response.error);
+          alert('Payment Failed: ' + (response.error.description || response.error.reason || 'Transaction could not be completed'));
+        });
+        rzp.open();
+      } catch (err) {
+        console.error('Failed to open Razorpay modal:', err);
+        document.getElementById('order-details-form').classList.add('hidden');
+        document.getElementById('upi-payment-section').classList.remove('hidden');
+      }
+    }
+
+    // Start Live Payment Status Polling (Every 3 seconds)
+    function startPaymentPolling(orderId, amount) {
+      stopPaymentPolling();
+      paymentPollInterval = setInterval(async () => {
+        try {
+          const resp = await fetch('/api/payment/status/' + encodeURIComponent(orderId));
+          if (!resp.ok) return;
+          const data = await resp.json();
+          if (data && data.paid) {
+            stopPaymentPolling();
+            onPaymentSuccess(orderId, amount, 'UPI');
+          }
+        } catch (_) {}
+      }, 3000);
+    }
+
+    // Client Verification via 12-Digit Bank Reference / UTR
+    async function verifyUpiPayment() {
+      if (!activePaymentOrder) return;
+
+      const utrInput = document.getElementById('upi-utr-input');
+      const errBanner = document.getElementById('upi-error-banner');
+      const errText = document.getElementById('upi-error-text');
+      const verifyBtn = document.getElementById('upi-verify-btn');
+
+      errBanner.classList.add('hidden');
+      const utr = (utrInput.value || '').trim();
+
+      if (!utr || utr.length !== 12 || !/^\d{12}$/.test(utr)) {
+        errText.innerText = 'Please enter a valid 12-digit Indian Bank UPI Reference / UTR Number from your transaction receipt.';
+        errBanner.classList.remove('hidden');
+        utrInput.focus();
+        return;
+      }
+
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-spin">refresh</span> Verifying...';
+
+      try {
+        const resp = await fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: activePaymentOrder.orderId,
+            bankUtr: utr,
+            productName: activePaymentOrder.productName || activePaymentOrder.juiceItem || activeJuice,
+            juiceItem: activePaymentOrder.juiceItem || activePaymentOrder.productName || activeJuice
+          })
+        });
+
+        const data = await resp.json();
+        if (data.success && data.status === 'PAID') {
+          stopPaymentPolling();
+          onPaymentSuccess(activePaymentOrder.orderId, data.amountPaid || activePaymentOrder.amount, 'UPI');
+        } else {
+          errText.innerText = data.message || 'Payment verification failed. Please check the UTR or retry in a moment.';
+          errBanner.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Verify error:', err);
+        errText.innerText = 'Error connecting to server. Please check network and retry.';
+        errBanner.classList.remove('hidden');
+      } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = '<span class="material-symbols-outlined text-[14px]">check_circle</span> <span>Verify</span>';
+      }
+    }
+
+    // Direct Button inside QR view to re-open Razorpay modal
+    function openRazorpayGatewayCheckout() {
+      if (!activePaymentOrder) {
+        alert('Please select an item and proceed to order.');
+        return;
+      }
+      launchRazorpayModal(activePaymentOrder, activePaymentOrder);
+    }
+
+    // Copy UPI ID to Clipboard with Feedback
+    function copyUpiId() {
+      const upiId = document.getElementById('upi-display-id').innerText || '8799779715@ptaxis';
+      navigator.clipboard.writeText(upiId).then(() => {
+        const icon = document.getElementById('upi-copy-icon');
+        const text = document.getElementById('upi-copy-text');
+        icon.innerText = 'done';
+        text.innerText = 'Copied!';
+        setTimeout(() => {
+          icon.innerText = 'content_copy';
+          text.innerText = 'Copy UPI ID';
+        }, 2000);
+      }).catch(() => {
+        prompt('Copy UPI ID:', upiId);
+      });
+    }
+
+    // Cancel UPI Payment and Return to Form
+    function cancelUpiPayment() {
+      stopPaymentPolling();
+      if (activePaymentOrder && activePaymentOrder.orderId) {
+        fetch('/api/payment/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: activePaymentOrder.orderId })
+        }).catch(() => {});
+      }
+      document.getElementById('upi-payment-section').classList.add('hidden');
+      document.getElementById('order-details-form').classList.remove('hidden');
+    }
+
+    // Common Payment / Order Success Handler
+    function onPaymentSuccess(orderId, amount, paymentMethod) {
+      stopPaymentPolling();
+      const order = activePaymentOrder || lastOrderData || {};
+      const fullAddress = order.address || document.getElementById('form-flat')?.value || 'Delhi';
+      const customerEmail = order.customerEmail || document.getElementById('form-email')?.value || '';
+      const customerName = order.name || document.getElementById('form-name')?.value || 'Customer';
+
+      // Switch to Confirmation Screen
+      document.getElementById('order-details-form').classList.add('hidden');
+      document.getElementById('upi-payment-section')?.classList.add('hidden');
+      document.getElementById('order-success-screen').classList.remove('hidden');
+
+      document.getElementById('success-order-id').innerText = 'Order ID: #' + orderId;
+      document.getElementById('success-amount-paid').innerText = '₹' + amount;
+      document.getElementById('success-payment-method').innerText = paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : `${paymentMethod} (Verified)`;
+      document.getElementById('success-payment-badge').innerText = paymentMethod === 'Cash on Delivery' ? 'Pay on Delivery' : 'PAID • Verified';
+      document.getElementById('success-delivery-address').innerHTML = '<strong>Deliver To:</strong> ' + fullAddress;
+      if (document.getElementById('success-user-email')) {
+        document.getElementById('success-user-email').innerText = customerEmail || 'your email';
+      }
+
+      // Dual Email Notification to kanhaiyapandat4@gmail.com
+      try {
+        fetch('https://formsubmit.co/ajax/kanhaiyapandat4@gmail.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            _subject: `order are placed - Shiv Juice Center #${orderId}`,
+            Message: 'order are placed',
+            OrderID: orderId,
+            CustomerName: customerName,
+            CustomerEmail: customerEmail,
+            Mobile: order.mobile,
+            DelhiLocality: order.delhiLocality,
+            Address: fullAddress,
+            ShopOrigin: 'Shiv Juice Center, Sonia Vihar 3rd Pusta, Delhi - 110094',
+            PaymentMethod: paymentMethod,
+            PaymentStatus: paymentMethod === 'Cash on Delivery' ? 'PENDING' : 'PAID',
+            JuiceOrdered: order.juiceItem || activeJuice,
+            Quantity: order.quantity || activeQty,
+            TotalAmount: '₹' + amount,
+            TargetAdmin: 'kanhaiyapandat4@gmail.com'
+          })
+        }).catch(() => {});
+      } catch(_) {}
+
+      // Dual Email Notification to customer email address
+      if (customerEmail && customerEmail.includes('@') && customerEmail !== 'kanhaiyapandat4@gmail.com') {
+        try {
+          fetch(`https://formsubmit.co/ajax/${encodeURIComponent(customerEmail)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+              _subject: `order are placed - Shiv Juice Center #${orderId}`,
+              Message: 'order are placed',
+              OrderID: orderId,
+              CustomerName: customerName,
+              PaymentStatus: paymentMethod === 'Cash on Delivery' ? 'Pay upon Delivery' : 'PAID (Verified)',
+              PaymentMethod: paymentMethod,
+              Items: `${order.juiceItem || activeJuice} (${order.quantity || activeQty} units)`,
+              TotalAmount: '₹' + amount,
+              DeliveryAddress: fullAddress,
+              ShopHub: 'Shiv Juice Center, Sonia Vihar 3rd Pusta, Delhi - 110094'
+            })
+          }).catch(() => {});
+        } catch(_) {}
+      }
+    }
+
+    // Open Live Tracking after confirmation
+    function openLiveTrackingFromConfirmation() {
+      closeOrderModal();
+      setTimeout(() => {
+        openTrackOrderModal(lastOrderData);
+      }, 300);
+    }
+
+    // Open Tracking Modal (Search or Direct)
+    function openTrackOrderModal(order) {
+      const backdrop = document.getElementById('tracking-modal-backdrop');
+      const card = document.getElementById('tracking-modal-card');
+      
+      backdrop.classList.remove('hidden');
+      backdrop.classList.add('flex');
+
+      setTimeout(() => {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+        initOrUpdateTrackingMap(order || lastOrderData);
+      }, 50);
+    }
+
+    function closeTrackOrderModal() {
+      const backdrop = document.getElementById('tracking-modal-backdrop');
+      const card = document.getElementById('tracking-modal-card');
+      
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+
+      if (routeAnimationTimer) clearInterval(routeAnimationTimer);
+
+      setTimeout(() => {
+        backdrop.classList.add('hidden');
+        backdrop.classList.remove('flex');
+      }, 250);
+    }
+
+    async function performOrderLookup() {
+      const query = document.getElementById('track-search-input').value.trim();
+      if (!query) return;
+
+      try {
+        const res = await fetch('/api/track/' + encodeURIComponent(query));
+        const data = await res.json();
+        if (data.success && data.order) {
+          initOrUpdateTrackingMap(data.order);
+        } else {
+          alert('No order found for "' + query + '". Please verify your Order ID or Delhi Mobile number.');
+        }
+      } catch(e) {
+        alert('Could not look up order. Please check connection.');
+      }
+    }
+
+    // ==========================================
+    // Interactive Map: Sonia Vihar Hub -> Delhi Locality Destination
+    // ==========================================
+    function initOrUpdateTrackingMap(order) {
+      const orderTitle = document.getElementById('track-modal-title');
+      const destText = document.getElementById('track-destination-text');
+      const gmapsLink = document.getElementById('track-gmaps-link');
+      const etaText = document.getElementById('track-eta');
+
+      let destAddress = 'Civil Lines, Delhi';
+      let destLocality = 'Civil Lines';
+      let destCoords = [28.6820, 77.2220]; // Default North Delhi
+      let localityMeta = DELHI_LOCALITIES["Civil Lines"];
+
+      if (order) {
+        orderTitle.innerText = `Tracking Order #${order.orderId || 'SJC'}`;
+        destLocality = order.delhiLocality || 'Sonia Vihar 3rd Pusta';
+        
+        // Find best match in Delhi localities
+        if (DELHI_LOCALITIES[destLocality]) {
+          localityMeta = DELHI_LOCALITIES[destLocality];
+          destCoords = localityMeta.coords;
+        } else {
+          // Find matching key from address text
+          const foundKey = Object.keys(DELHI_LOCALITIES).find(k => (order.address || '').toLowerCase().includes(k.toLowerCase()));
+          if (foundKey) {
+            localityMeta = DELHI_LOCALITIES[foundKey];
+            destCoords = localityMeta.coords;
+            destLocality = foundKey;
+          } else {
+            localityMeta = DELHI_LOCALITIES["Other Delhi Locality"];
+            // Keep strictly clamped inside Delhi NCT
+            const pinSum = (order.pincode || '110094').split('').reduce((a,c) => a + Number(c), 0);
+            destCoords = [
+              Math.max(28.53, Math.min(28.74, SONIA_VIHAR_COORDS[0] - (pinSum % 8) * 0.02)),
+              Math.max(77.08, Math.min(77.29, SONIA_VIHAR_COORDS[1] - (pinSum % 6) * 0.02))
+            ];
+          }
+        }
+
+        destAddress = order.address || `${destLocality}, Delhi - ${order.pincode || '110094'}`;
+        destText.innerHTML = `📍 <strong>Deliver To:</strong> ${destAddress} <span class="text-secondary font-bold">(${localityMeta.zone || 'Delhi Area'})</span>`;
+        if (etaText) {
+          etaText.innerText = `${localityMeta.eta} • Approx ${localityMeta.dist} from Sonia Vihar 3rd Pusta`;
+        }
+      } else {
+        orderTitle.innerText = 'Tracking Order (Delhi GPS Radar)';
+        destText.innerHTML = '📍 <strong>Deliver To:</strong> Delhi NCR Delivery Zone';
+      }
+
+      // Update Official Google Maps Route URL from Sonia Vihar 3rd Pusta to Delhi Locality
+      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=Shiv+Juice+Center,+Sonia+Vihar+3rd+Pusta,+Delhi&destination=${encodeURIComponent(destAddress)}`;
+      gmapsLink.href = gmapsUrl;
+
+      // Initialize Leaflet Map once
+      if (!leafletMapInstance) {
+        leafletMapInstance = L.map('tracking-map', {
+          zoomControl: true,
+          attributionControl: false
+        }).setView(SONIA_VIHAR_COORDS, 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18
+        }).addTo(leafletMapInstance);
+      }
+
+      // Clear existing layers
+      leafletMapInstance.eachLayer(layer => {
+        if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+          leafletMapInstance.removeLayer(layer);
+        }
+      });
+
+      // 1. Origin Marker: Shiv Juice Center Sonia Vihar 3rd Pusta Hub
+      const shopIcon = L.divIcon({
+        className: 'custom-hub-marker',
+        html: '<div style="background:#780026;color:#fff;padding:5px 9px;border-radius:12px;font-size:11px;font-weight:bold;box-shadow:0 4px 12px rgba(0,0,0,0.3);border:2px solid #fff;display:flex;align-items:center;gap:4px;white-space:nowrap;">🏪 Sonia Vihar 3rd Pusta Hub</div>',
+        iconSize: [160, 30],
+        iconAnchor: [80, 15]
+      });
+      L.marker(SONIA_VIHAR_COORDS, { icon: shopIcon }).addTo(leafletMapInstance)
+        .bindPopup('<b>Shiv Juice Center</b><br>Sonia Vihar 3rd Pusta, Delhi - 110094<br><small>Fresh Rose Milk & Shake Dispatch Center</small>').openPopup();
+
+      // 2. Customer Destination Marker in Delhi
+      const destIcon = L.divIcon({
+        className: 'custom-dest-marker',
+        html: `<div style="background:#b81059;color:#fff;padding:5px 9px;border-radius:12px;font-size:11px;font-weight:bold;box-shadow:0 4px 12px rgba(0,0,0,0.3);border:2px solid #fff;display:flex;align-items:center;gap:4px;white-space:nowrap;">📍 ${destLocality}</div>`,
+        iconSize: [140, 30],
+        iconAnchor: [70, 15]
+      });
+      L.marker(destCoords, { icon: destIcon }).addTo(leafletMapInstance)
+        .bindPopup(`<b>Delivery Destination:</b><br>${destAddress}`);
+
+      // 3. Realistic Delhi Route Waypoints (Crossing Wazirabad/Signature Bridge or Ring Road)
+      const midLat = (SONIA_VIHAR_COORDS[0] + destCoords[0]) / 2;
+      const midLng = (SONIA_VIHAR_COORDS[1] + destCoords[1]) / 2;
+      // Waypoint slightly pulled towards Yamuna bridge road corridor
+      const bridgeWaypoint = [ 28.7120, 77.2380 ]; 
+
+      const routePoints = [
+        SONIA_VIHAR_COORDS,
+        [ 28.7210, 77.2540 ], // Pusta Road
+        bridgeWaypoint,       // Signature / Wazirabad bridge artery
+        [ midLat, midLng ],   // Mid Delhi road
+        destCoords            // Destination Delhi Locality
+      ];
+
+      const polyline = L.polyline(routePoints, {
+        color: '#780026',
+        weight: 4,
+        opacity: 0.85,
+        dashArray: '8, 8'
+      }).addTo(leafletMapInstance);
+
+      leafletMapInstance.fitBounds(polyline.getBounds(), { padding: [45, 45] });
+
+      // 4. Animated Moving Scooter Marker along Delhi Route
+      const scooterIcon = L.divIcon({
+        className: 'scooter-marker',
+        html: '<div style="background:#fff;border-radius:50%;padding:4px;box-shadow:0 4px 10px rgba(0,0,0,0.3);border:2px solid #b81059;font-size:18px;display:flex;align-items:center;justify-content:center;width:34px;height:34px;">🛵</div>',
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
+      });
+
+      if (riderMarker) leafletMapInstance.removeLayer(riderMarker);
+      riderMarker = L.marker(SONIA_VIHAR_COORDS, { icon: scooterIcon }).addTo(leafletMapInstance);
+
+      let step = 0;
+      const totalSteps = 120;
+      if (routeAnimationTimer) clearInterval(routeAnimationTimer);
+
+      routeAnimationTimer = setInterval(() => {
+        step = (step + 1) % totalSteps;
+        const progress = step / totalSteps;
+        
+        // Multi-segment lerp across route points
+        const numSegments = routePoints.length - 1;
+        const segIndex = Math.min(Math.floor(progress * numSegments), numSegments - 1);
+        const segProgress = (progress * numSegments) - segIndex;
+        
+        const p1 = routePoints[segIndex];
+        const p2 = routePoints[segIndex + 1];
+
+        const lat = p1[0] + (p2[0] - p1[0]) * segProgress;
+        const lng = p1[1] + (p2[1] - p1[1]) * segProgress;
+        riderMarker.setLatLng([lat, lng]);
+      }, 250);
+
+      setTimeout(() => {
+        leafletMapInstance.invalidateSize();
+      }, 200);
+    }
+  </script>
+
+  <!-- Custom Crate Builder Script -->
+  <script>
+    let currentPackBottles = 3;
+    let currentPackPrice = 215;
+    let counts = { c1: 2, c2: 1, c3: 0 };
+
+    function selectPack(bottles, price, element) {
+      currentPackBottles = bottles;
+      currentPackPrice = price;
+
+      document.querySelectorAll('.pack-btn').forEach(btn => {
+        btn.classList.remove('border-primary');
+        btn.classList.add('border-transparent');
+      });
+      element.classList.remove('border-transparent');
+      element.classList.add('border-primary');
+
+      updateSummary();
+    }
+
+    function adjustCount(id, delta) {
+      const newCount = counts[id] + delta;
+      if (newCount >= 0) {
+        counts[id] = newCount;
+        document.getElementById(id + '-count').innerText = newCount;
+        updateSummary();
+      }
+    }
+
+    function updateSummary() {
+      const totalBottles = counts.c1 + counts.c2 + counts.c3;
+      const subtotalEl = document.getElementById('summary-subtotal');
+      const bottlesEl = document.getElementById('summary-bottles');
+      const totalEl = document.getElementById('summary-total');
+      const packEl = document.getElementById('summary-pack');
+
+      bottlesEl.innerText = totalBottles + ' Bottles';
+      packEl.innerText = currentPackBottles + '-Bottle Tasting Crate';
+      
+      const calculatedPrice = currentPackPrice + (Math.max(0, totalBottles - currentPackBottles) * 75);
+      subtotalEl.innerText = '₹' + calculatedPrice.toFixed(2);
+      totalEl.innerText = '₹' + calculatedPrice;
+    }
+  </script>
+
+  <!-- Fullscreen Animated Hero & Pop-Up Section Scroll Engine -->
+  <script src="app.js"></script>
+</body>
+</html>
