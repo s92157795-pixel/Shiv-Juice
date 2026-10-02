@@ -1230,14 +1230,21 @@
           </div>
           <div>
             <label class="block text-[11px] font-bold text-primary mb-1">Payment Method</label>
-            <div class="flex gap-2">
-              <label class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
-                <input type="radio" name="paymentMethod" value="Cash on Delivery" class="text-primary"/>
-                <span>💵 Cash on Delivery</span>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl bg-surface-container-low text-[11px] cursor-pointer border-2 border-primary/20 hover:border-primary transition-all hover:scale-[1.02] has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:shadow-md">
+                <input type="radio" name="paymentMethod" value="Cash on Delivery" class="text-primary sr-only"/>
+                <span class="text-lg">💵</span>
+                <span class="font-bold text-primary text-center leading-tight">Cash on<br>Delivery</span>
               </label>
-              <label class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
-                <input type="radio" name="paymentMethod" value="Razorpay" checked class="text-primary"/>
-                <span>💳 Razorpay / UPI</span>
+              <label class="flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl bg-surface-container-low text-[11px] cursor-pointer border-2 border-primary/20 hover:border-primary transition-all hover:scale-[1.02] has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:shadow-md">
+                <input type="radio" name="paymentMethod" value="UPI" class="text-primary sr-only"/>
+                <span class="text-lg">📱</span>
+                <span class="font-bold text-emerald-700 text-center leading-tight">UPI<br>Scanner</span>
+              </label>
+              <label class="flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl bg-surface-container-low text-[11px] cursor-pointer border-2 border-primary/20 hover:border-primary transition-all hover:scale-[1.02] has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:shadow-md" >
+                <input type="radio" name="paymentMethod" value="Razorpay" checked class="text-primary sr-only"/>
+                <span class="text-lg">💳</span>
+                <span class="font-bold text-blue-700 text-center leading-tight">Razorpay<br>Checkout</span>
               </label>
             </div>
           </div>
@@ -1299,7 +1306,7 @@
         </div>
 
         <!-- Prominent Razorpay Direct Checkout Action -->
-        <div class="p-3 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-sm">
+        <div class="razorpay-checkout-section p-3 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-sm">
           <div class="text-left">
             <span class="text-xs font-bold text-primary flex items-center gap-1.5">
               <span class="material-symbols-outlined text-sm text-secondary">flash_on</span>
@@ -1692,14 +1699,18 @@
           </div>
           <div>
             <label class="block text-[11px] font-bold text-primary mb-1">Preferred Payment</label>
-            <div class="flex gap-2">
-              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
-                <input type="radio" name="profilePaymentMethod" value="Cash on Delivery" class="text-primary"/>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                <input type="radio" name="profilePaymentMethod" value="Cash on Delivery" class="text-primary sr-only"/>
                 <span>💵 Cash</span>
               </label>
-              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary">
-                <input type="radio" name="profilePaymentMethod" value="Razorpay" checked class="text-primary"/>
-                <span>💳 Online</span>
+              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                <input type="radio" name="profilePaymentMethod" value="UPI" class="text-primary sr-only"/>
+                <span>📱 UPI</span>
+              </label>
+              <label class="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-low text-xs cursor-pointer border border-primary/20 hover:border-primary has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                <input type="radio" name="profilePaymentMethod" value="Razorpay" checked class="text-primary sr-only"/>
+                <span>💳 Razorpay</span>
               </label>
             </div>
           </div>
@@ -2551,8 +2562,10 @@
     }
 
     function confirmLogout() {
+      // Clear ALL user auth and profile data so gateway shows again
       localStorage.removeItem('sjc_auth_user');
       sessionStorage.removeItem('sjc_auth_user');
+      localStorage.removeItem('sjc_user_profile');
       closeLogoutModal();
       // Reset all signup steps to initial state
       const step1 = document.getElementById('signup-step-1');
@@ -2566,9 +2579,26 @@
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
-      // Switch to Sign In tab and show gateway
+      // Hide the user badge in navbar
+      const userBadge = document.getElementById('nav-user-badge');
+      if (userBadge) {
+        userBadge.classList.remove('flex');
+        userBadge.classList.add('hidden');
+      }
+      // Switch to Sign In tab
       switchAuthTab('signin');
-      checkLoginState();
+      // Force-show the login gateway screen with smooth animation
+      const gateway = document.getElementById('login-gateway-screen');
+      if (gateway) {
+        gateway.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'scale-95');
+        gateway.style.display = 'flex';
+        // Small delay for transition
+        requestAnimationFrame(() => {
+          gateway.classList.add('flex', 'opacity-100');
+        });
+      }
+      // Scroll to top of the page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // Call checkLoginState immediately on load
@@ -2772,7 +2802,8 @@
       // FLOW A: RAZORPAY / UPI PAYMENT GATEWAY (REAL SERVER-VERIFIED)
       // ==========================================
       if (paymentMethod === 'Razorpay' || paymentMethod === 'UPI') {
-        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin">refresh</span> Launching Razorpay Checkout...';
+        const isUpiOnly = (paymentMethod === 'UPI');
+        submitBtn.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin">refresh</span> ${isUpiOnly ? 'Opening UPI Payment...' : 'Launching Razorpay Checkout...'}`;
 
         try {
           const resp = await fetch('/api/create-order', {
@@ -2783,7 +2814,7 @@
           const result = await resp.json();
 
           if (!result.success || !result.order_id) {
-            alert('Error creating Razorpay order: ' + (result.error || result.message || 'Please check credentials'));
+            alert('Error creating order: ' + (result.error || result.message || 'Please check credentials'));
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check_circle</span> Place Your Order';
             return;
@@ -2792,7 +2823,7 @@
           // Retain order details
           orderPayload.orderId = result.orderId;
           orderPayload.finalAmount = result.amountInRupees || (result.amount / 100);
-          orderPayload.paymentMethod = 'Razorpay';
+          orderPayload.paymentMethod = paymentMethod;
           activePaymentOrder = { ...orderPayload, ...result };
           lastOrderData = orderPayload;
 
@@ -2830,11 +2861,21 @@
           document.getElementById('upi-payment-section').classList.remove('hidden');
           startPaymentPolling(result.orderId, payableRupees);
 
-          // Automatically trigger Razorpay Standard Checkout modal
-          if (window.Razorpay) {
-            setTimeout(() => {
-              launchRazorpayModal(result, orderPayload);
-            }, 300);
+          // UPI-ONLY flow: Show UPI scanner/QR/apps, HIDE the Razorpay checkout button
+          // RAZORPAY flow: Show Razorpay checkout button and auto-launch Razorpay modal
+          const razorpaySection = document.getElementById('upi-payment-section').querySelector('.razorpay-checkout-section');
+          if (isUpiOnly) {
+            // Hide the Razorpay Instant Checkout card when user chose UPI only
+            if (razorpaySection) razorpaySection.style.display = 'none';
+          } else {
+            // Show the Razorpay Instant Checkout card for Razorpay flow
+            if (razorpaySection) razorpaySection.style.display = '';
+            // Automatically trigger Razorpay Standard Checkout modal
+            if (window.Razorpay) {
+              setTimeout(() => {
+                launchRazorpayModal(result, orderPayload);
+              }, 300);
+            }
           }
         } catch (err) {
           console.error('Payment initialization error:', err);
@@ -3067,6 +3108,9 @@
       }
       document.getElementById('upi-payment-section').classList.add('hidden');
       document.getElementById('order-details-form').classList.remove('hidden');
+      // Reset Razorpay checkout section visibility for next attempt
+      const razorpaySection = document.getElementById('upi-payment-section').querySelector('.razorpay-checkout-section');
+      if (razorpaySection) razorpaySection.style.display = '';
     }
 
     // Common Payment / Order Success Handler
