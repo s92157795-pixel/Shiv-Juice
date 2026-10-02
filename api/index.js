@@ -136,6 +136,19 @@ function normalizeIndianMobile(raw) {
   return null;
 }
 
+// Password hashing & verification utilities (PBKDF2 standard)
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  return `${salt}:${hash}`;
+}
+
+function verifyPassword(password, storedHash) {
+  if (!storedHash || typeof storedHash !== 'string' || !storedHash.includes(':')) return false;
+  const [salt, originalHash] = storedHash.split(':');
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  return hash === originalHash;
+}
+
 // Helper: Dispatch SMS via Fast2SMS to any mobile number
 async function dispatchFast2Sms(mobile, otp) {
   const apiKey = process.env.FAST2SMS_API_KEY;
@@ -501,25 +514,185 @@ const requestHandler = (req, res) => {
 
         // Authentication successful
         otpStore.delete(cleanMobile);
+        const profile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        const hasPassword = !!(profile && profile.passwordHash);
+
         const user = {
-          name: `Customer (${cleanMobile.slice(-4)})`,
+          name: (profile && profile.name) ? profile.name : `Customer (${cleanMobile.slice(-4)})`,
           mobile: cleanMobile,
-          email: `${cleanMobile}@customer.shivjuice.com`,
-          loginType: 'mobile',
+          email: (profile && profile.email) ? profile.email : `${cleanMobile}@customer.shivjuice.com`,
+          loginType: 'mobile_otp',
+          hasPassword: hasPassword,
           loginTime: new Date().toISOString()
         };
 
-        console.log(`[USER AUTHENTICATED] Mobile: +91 ${cleanMobile}`);
+        console.log(`[USER AUTHENTICATED VIA OTP] Mobile: +91 ${cleanMobile} (hasPassword: ${hasPassword})`);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           success: true,
           message: 'OTP verified successfully.',
+          isNewUser: !hasPassword,
+          hasPassword: hasPassword,
           user: user
         }));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, message: 'Verification error: ' + err.message }));
+      }
+    });
+    return;
+  }
+
+  // ==========================================
+  // AUTH: Check if User Exists & Has Password
+  // ==========================================
+  if (req.method === 'POST' && reqPath === '/api/check-user') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { mobile } = JSON.parse(body || '{}');
+        const cleanMobile = normalizeIndianMobile(mobile);
+        if (!cleanMobile) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Valid 10-digit mobile number required.' }));
+        }
+        const profile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        const hasPassword = !!(profile && profile.passwordHash);
+        const exists = !!profile;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          mobile: cleanMobile,
+          exists: exists,
+          hasPassword: hasPassword,
+          name: profile ? (profile.name || null) : null
+        }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Server error: ' + err.message }));
+      }
+    });
+    return;
+  }
+
+  // ==========================================
+  // AUTH: Sign In with Mobile & Password (Returning Users)
+  // ==========================================
+  if (req.method === 'POST' && reqPath === '/api/login-password') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { mobile, password } = JSON.parse(body || '{}');
+        const cleanMobile = normalizeIndianMobile(mobile);
+        if (!cleanMobile) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Please enter a valid 10-digit mobile number.' }));
+        }
+        if (!password || typeof password !== 'string' || password.length < 1) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Please enter your password.' }));
+        }
+
+        const profile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        if (!profile || !profile.passwordHash) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({
+            success: false,
+            code: 'NO_ACCOUNT',
+            message: 'No account with a password found for this number. Please Sign Up to create an account.'
+          }));
+        }
+
+        const isMatch = verifyPassword(password, profile.passwordHash);
+        if (!isMatch) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({
+            success: false,
+            code: 'WRONG_PASSWORD',
+            message: 'Incorrect password. Please try again or sign in with OTP.'
+          }));
+        }
+
+        const user = {
+          name: profile.name || `Customer (${cleanMobile.slice(-4)})`,
+          mobile: cleanMobile,
+          email: profile.email || `${cleanMobile}@customer.shivjuice.com`,
+          loginType: 'password',
+          hasPassword: true,
+          loginTime: new Date().toISOString()
+        };
+
+        console.log(`[USER SIGNED IN VIA PASSWORD] Mobile: +91 ${cleanMobile} (${user.name})`);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          message: 'Signed in successfully!',
+          user: user
+        }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Login error: ' + err.message }));
+      }
+    });
+    return;
+  }
+
+  // ==========================================
+  // AUTH: Set Password & Complete Signup (First-Time Users)
+  // ==========================================
+  if (req.method === 'POST' && reqPath === '/api/set-password') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { mobile, password, name } = JSON.parse(body || '{}');
+        const cleanMobile = normalizeIndianMobile(mobile);
+        if (!cleanMobile) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Valid 10-digit mobile number is required.' }));
+        }
+        if (!password || typeof password !== 'string' || password.length < 6) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Password must be at least 6 characters long.' }));
+        }
+
+        const passwordHash = hashPassword(password);
+        let updatedProfile = { mobile: cleanMobile, passwordHash };
+        if (name && name.trim()) {
+          updatedProfile.name = name.trim();
+        }
+
+        if (orderSummaryService) {
+          const resSave = orderSummaryService.saveProfile(updatedProfile);
+          if (resSave && resSave.profile) {
+            updatedProfile = resSave.profile;
+          }
+        }
+
+        const user = {
+          name: updatedProfile.name || (name && name.trim()) || `Customer (${cleanMobile.slice(-4)})`,
+          mobile: cleanMobile,
+          email: updatedProfile.email || `${cleanMobile}@customer.shivjuice.com`,
+          loginType: 'signup',
+          hasPassword: true,
+          loginTime: new Date().toISOString()
+        };
+
+        console.log(`[PASSWORD SET & USER REGISTERED] Mobile: +91 ${cleanMobile} (${user.name})`);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          message: 'Password set successfully! Welcome to Shiv Juice Center.',
+          user: user
+        }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Error setting password: ' + err.message }));
       }
     });
     return;
