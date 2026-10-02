@@ -1444,6 +1444,34 @@ const requestHandler = (req, res) => {
 
   // ==========================================
 
+  // Static Homepage & Asset Fallback if invoked directly
+  if (reqPath === '/' || reqPath === '/index.html') {
+    const htmlPath = path.join(__dirname, '..', 'index.html');
+    if (fs.existsSync(htmlPath)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+      res.end(fs.readFileSync(htmlPath));
+      return;
+    }
+  }
+
+  if (reqPath === '/app.js') {
+    const jsPath = path.join(__dirname, '..', 'app.js');
+    if (fs.existsSync(jsPath)) {
+      res.writeHead(200, { 'Content-Type': 'application/javascript; charset=UTF-8' });
+      res.end(fs.readFileSync(jsPath));
+      return;
+    }
+  }
+
+  if (reqPath === '/style.css') {
+    const cssPath = path.join(__dirname, '..', 'style.css');
+    if (fs.existsSync(cssPath)) {
+      res.writeHead(200, { 'Content-Type': 'text/css; charset=UTF-8' });
+      res.end(fs.readFileSync(cssPath));
+      return;
+    }
+  }
+
   // Unhandled API Route fallback
   res.writeHead(404, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ success: false, message: 'API route not found: ' + reqPath }));
