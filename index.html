@@ -30,6 +30,13 @@
         overscroll-behavior: none;
       }
     }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 8s linear infinite;
+    }
     /* Hide scrollbars across all browsers */
     html, body {
       scrollbar-width: none;
@@ -1041,8 +1048,60 @@
   <!-- ================================================================= -->
   <!-- AMAZON-GRADE ORDER FORM MODAL                                     -->
   <!-- ================================================================= -->
-  <div id="order-modal-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 transition-all duration-300">
-    <div id="order-modal-card" class="bg-surface/95 backdrop-blur-2xl rounded-3xl p-5 sm:p-7 max-w-xl w-full border-2 border-primary/40 shadow-2xl relative transform transition-all scale-95 opacity-0 duration-300 max-h-[92vh] overflow-y-auto">
+  <div id="order-modal-backdrop" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto transition-all duration-300">
+    <div id="order-modal-wrapper" class="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-4 sm:gap-6 my-auto transition-all duration-300">
+      
+      <!-- 360 DEGREE ROTATING PRODUCT SHOWCASE (ON THE SIDE) -->
+      <div id="order-360-container" class="bg-surface/95 backdrop-blur-2xl rounded-3xl p-4 sm:p-5 w-full max-w-sm lg:w-[350px] xl:w-[380px] border-2 border-primary/30 shadow-2xl flex flex-col items-center justify-center text-center transform transition-all scale-95 opacity-0 duration-300 shrink-0 relative overflow-hidden self-center">
+        <!-- Floating 360 Badge -->
+        <div class="flex items-center justify-between w-full pb-2 mb-2 border-b border-primary/15">
+          <div class="flex items-center gap-1.5 text-primary font-bold text-xs">
+            <span class="material-symbols-outlined text-[19px] text-secondary animate-spin-slow">360</span>
+            <span>360° Live Product View</span>
+          </div>
+          <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+            Rotate All Sides
+          </span>
+        </div>
+
+        <!-- Interactive 360 Product Canvas Card -->
+        <div class="relative w-full aspect-square max-w-[270px] sm:max-w-[290px] flex items-center justify-center rounded-2xl bg-gradient-to-b from-[#fff5f7] via-[#fae1e8] to-[#f7ced8]/40 border border-primary/20 shadow-inner group overflow-hidden">
+          <canvas id="order-360-canvas" class="w-full h-full object-contain cursor-grab active:cursor-grabbing select-none" style="touch-action: none;"></canvas>
+          
+          <!-- Subtle Drag Overlay Hint -->
+          <div id="order-360-hint" class="absolute bottom-2.5 px-3 py-1 rounded-full bg-black/65 backdrop-blur-sm text-white text-[10px] font-medium flex items-center gap-1.5 pointer-events-none transition-opacity duration-300 shadow">
+            <span class="material-symbols-outlined text-xs">swipe</span>
+            <span>Drag or swipe to spin</span>
+          </div>
+        </div>
+
+        <!-- Product Name & Real Bottle Specifications -->
+        <div class="mt-2.5 w-full">
+          <h4 id="order-360-juice-title" class="font-headline-sm text-sm sm:text-base font-bold text-primary truncate">
+            Classic Damascus Rose Milk
+          </h4>
+          <p class="text-[10px] text-on-surface-variant font-medium mt-0.5">
+            Dispatched Chilled in Sealed Glass Bottle • Sonia Vihar Hub
+          </p>
+          <div class="grid grid-cols-3 gap-1.5 mt-2.5 pt-2 border-t border-primary/15 text-[10px] font-bold text-primary/80">
+            <div class="p-1 rounded-lg bg-primary/5 flex flex-col items-center">
+              <span>Pure Milk</span>
+              <span class="text-[8.5px] text-secondary font-normal">Fresh Daily</span>
+            </div>
+            <div class="p-1 rounded-lg bg-primary/5 flex flex-col items-center">
+              <span>Damascus</span>
+              <span class="text-[8.5px] text-secondary font-normal">Rose Extract</span>
+            </div>
+            <div class="p-1 rounded-lg bg-primary/5 flex flex-col items-center">
+              <span>0% Chemical</span>
+              <span class="text-[8.5px] text-secondary font-normal">100% Pure</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Details Form Card -->
+      <div id="order-modal-card" class="bg-surface/95 backdrop-blur-2xl rounded-3xl p-5 sm:p-7 max-w-xl w-full border-2 border-primary/40 shadow-2xl relative transform transition-all scale-95 opacity-0 duration-300 max-h-[92vh] overflow-y-auto">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-3 mb-3 border-b border-outline-variant/30">
@@ -1453,6 +1512,7 @@
         </div>
       </div>
 
+    </div>
     </div>
   </div>
 
@@ -2739,6 +2799,123 @@
       }
     }
 
+    // =========================================================================
+    // 360-DEGREE ROTATING PRODUCT ENGINE FOR CHECKOUT MODAL
+    // =========================================================================
+    const TOTAL_360_STEPS = 72; // 72 smooth frames covering full 360-degree rotation
+    let order360Frames = [];
+    let order360LoadedCount = 0;
+    let order360CurrentIndex = 0;
+    let order360AnimId = null;
+    let isOrder360Dragging = false;
+    let order360StartX = 0;
+    let order360StartIndex = 0;
+    let order360AutoRotate = true;
+    let order360LastStepTime = 0;
+
+    function initOrder360Engine() {
+      if (order360Frames.length > 0) return;
+      const step = Math.floor(285 / TOTAL_360_STEPS);
+      for (let i = 0; i < TOTAL_360_STEPS; i++) {
+        const frameNum = Math.min(285, i * step + 1);
+        const pad = String(frameNum).padStart(3, '0');
+        const img = new Image();
+        img.src = `frames/ezgif-frame-${pad}.jpg`;
+        img.onload = () => {
+          order360LoadedCount++;
+          if (order360LoadedCount === 1) renderOrder360Frame(0);
+        };
+        order360Frames.push(img);
+      }
+
+      const canvas = document.getElementById('order-360-canvas');
+      if (!canvas) return;
+
+      canvas.addEventListener('pointerdown', (e) => {
+        isOrder360Dragging = true;
+        order360AutoRotate = false;
+        order360StartX = e.clientX;
+        order360StartIndex = order360CurrentIndex;
+        try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        const hint = document.getElementById('order-360-hint');
+        if (hint) hint.classList.add('opacity-0');
+      });
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (!isOrder360Dragging) return;
+        const dx = e.clientX - order360StartX;
+        const frameShift = Math.floor(dx / 5);
+        order360CurrentIndex = (order360StartIndex - frameShift + order360Frames.length * 100) % order360Frames.length;
+        renderOrder360Frame(order360CurrentIndex);
+      });
+
+      function onPointerEnd(e) {
+        if (isOrder360Dragging) {
+          isOrder360Dragging = false;
+          try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+          setTimeout(() => {
+            if (!isOrder360Dragging) order360AutoRotate = true;
+          }, 2000);
+        }
+      }
+      canvas.addEventListener('pointerup', onPointerEnd);
+      canvas.addEventListener('pointercancel', onPointerEnd);
+    }
+
+    function renderOrder360Frame(idx) {
+      const canvas = document.getElementById('order-360-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const img = order360Frames[idx % order360Frames.length];
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.floor((rect.width || 280) * dpr);
+      const h = Math.floor((rect.height || 280) * dpr);
+
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const scale = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+      const dw = img.naturalWidth * scale;
+      const dh = img.naturalHeight * scale;
+      const dx = (canvas.width - dw) / 2;
+      const dy = (canvas.height - dh) / 2;
+
+      ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, dx, dy, dw, dh);
+    }
+
+    function startOrder360Animation() {
+      initOrder360Engine();
+      stopOrder360Animation();
+      order360AutoRotate = true;
+      order360LastStepTime = performance.now();
+
+      function step(now) {
+        if (order360AutoRotate && !isOrder360Dragging && order360Frames.length > 0) {
+          if (now - order360LastStepTime >= 45) {
+            order360CurrentIndex = (order360CurrentIndex + 1) % order360Frames.length;
+            renderOrder360Frame(order360CurrentIndex);
+            order360LastStepTime = now;
+          }
+        }
+        order360AnimId = requestAnimationFrame(step);
+      }
+      order360AnimId = requestAnimationFrame(step);
+    }
+
+    function stopOrder360Animation() {
+      if (order360AnimId) {
+        cancelAnimationFrame(order360AnimId);
+        order360AnimId = null;
+      }
+    }
+
     function openOrderModal(juiceName, price) {
       activeJuice = juiceName;
       activePrice = price;
@@ -2811,6 +2988,15 @@
       document.getElementById('upi-payment-section')?.classList.add('hidden');
       document.getElementById('order-success-screen').classList.add('hidden');
 
+      // Update and reveal 360 Rotating Product Showcase
+      const container360 = document.getElementById('order-360-container');
+      const title360 = document.getElementById('order-360-juice-title');
+      if (title360) title360.innerText = activeJuice;
+      if (container360) {
+        container360.classList.remove('hidden');
+        startOrder360Animation();
+      }
+
       const backdrop = document.getElementById('order-modal-backdrop');
       const card = document.getElementById('order-modal-card');
       
@@ -2820,6 +3006,10 @@
       setTimeout(() => {
         card.classList.remove('scale-95', 'opacity-0');
         card.classList.add('scale-100', 'opacity-100');
+        if (container360) {
+          container360.classList.remove('scale-95', 'opacity-0');
+          container360.classList.add('scale-100', 'opacity-100');
+        }
       }, 10);
     }
 
@@ -2831,15 +3021,22 @@
 
     function closeOrderModal() {
       stopPaymentPolling();
+      stopOrder360Animation();
       const backdrop = document.getElementById('order-modal-backdrop');
       const card = document.getElementById('order-modal-card');
+      const container360 = document.getElementById('order-360-container');
       
       card.classList.remove('scale-100', 'opacity-100');
       card.classList.add('scale-95', 'opacity-0');
+      if (container360) {
+        container360.classList.remove('scale-100', 'opacity-100');
+        container360.classList.add('scale-95', 'opacity-0');
+      }
 
       setTimeout(() => {
         backdrop.classList.add('hidden');
         backdrop.classList.remove('flex');
+        if (container360) container360.classList.add('hidden');
       }, 250);
     }
 
@@ -3235,7 +3432,11 @@
       const customerEmail = order.customerEmail || document.getElementById('form-email')?.value || '';
       const customerName = order.name || document.getElementById('form-name')?.value || 'Customer';
 
-      // Switch to Confirmation Screen
+      // Switch to Confirmation Screen & hide 360 product showcase
+      stopOrder360Animation();
+      const container360 = document.getElementById('order-360-container');
+      if (container360) container360.classList.add('hidden');
+
       document.getElementById('order-details-form').classList.add('hidden');
       document.getElementById('upi-payment-section')?.classList.add('hidden');
       document.getElementById('order-success-screen').classList.remove('hidden');
