@@ -1,5 +1,5 @@
 # Ignore local server so Vercel treats the root site as 100% static CDN assets
-server.js
+dev-server.js
 
 # Ignore local logs and summaries
 *.log
