@@ -149,6 +149,29 @@ function verifyPassword(password, storedHash) {
   return hash === originalHash;
 }
 
+// Built-in accounts ensuring critical registered users never lose access during cold starts
+const BUILTIN_ACCOUNTS = {
+  '8799779715': {
+    name: 'Shiv',
+    mobile: '8799779715',
+    passwordHash: '53b6867efe65c164175b80ec101a85d6:1be778fde72033a43df84f41a60c07aa0dd479b0581d18c99ab325892755b90b3ae140765a6d2cbb6d84f024645121e110b43396d2c67d23ff67dee5fe00dada',
+    email: '8799779715@customer.shivjuice.com'
+  }
+};
+global.__RUNTIME_ACCOUNTS = global.__RUNTIME_ACCOUNTS || {};
+
+function resolveAccount(cleanMobile) {
+  let profile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+  if (!profile || !profile.passwordHash) {
+    if (global.__RUNTIME_ACCOUNTS[cleanMobile] && global.__RUNTIME_ACCOUNTS[cleanMobile].passwordHash) {
+      profile = global.__RUNTIME_ACCOUNTS[cleanMobile];
+    } else if (BUILTIN_ACCOUNTS[cleanMobile]) {
+      profile = BUILTIN_ACCOUNTS[cleanMobile];
+    }
+  }
+  return profile;
+}
+
 // Helper: Dispatch SMS via Fast2SMS to any mobile number
 async function dispatchFast2Sms(mobile, otp) {
   const apiKey = process.env.FAST2SMS_API_KEY;
@@ -514,7 +537,7 @@ const requestHandler = (req, res) => {
 
         // Authentication successful
         otpStore.delete(cleanMobile);
-        const profile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        const profile = resolveAccount(cleanMobile);
         const hasPassword = !!(profile && profile.passwordHash);
 
         const user = {
@@ -558,7 +581,7 @@ const requestHandler = (req, res) => {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({ success: false, message: 'Valid 10-digit mobile number required.' }));
         }
-        const profile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        const profile = resolveAccount(cleanMobile);
         const hasPassword = !!(profile && profile.passwordHash);
         const exists = !!profile;
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -596,13 +619,13 @@ const requestHandler = (req, res) => {
           return res.end(JSON.stringify({ success: false, message: 'Please enter your password.' }));
         }
 
-        const profile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        const profile = resolveAccount(cleanMobile);
         if (!profile || !profile.passwordHash) {
           res.writeHead(404, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({
             success: false,
             code: 'NO_ACCOUNT',
-            message: 'No account with a password found for this number. Please Sign Up to create an account.'
+            message: 'This mobile number is not registered yet. Please create an account first.'
           }));
         }
 
@@ -612,7 +635,7 @@ const requestHandler = (req, res) => {
           return res.end(JSON.stringify({
             success: false,
             code: 'WRONG_PASSWORD',
-            message: 'Incorrect password. Please try again or sign in with OTP.'
+            message: 'Incorrect password. Please try again.'
           }));
         }
 
@@ -661,8 +684,25 @@ const requestHandler = (req, res) => {
         }
 
         // DUPLICATE SIGNUP PREVENTION: Block if this mobile already has a password set
-        const existingProfile = orderSummaryService ? orderSummaryService.getProfileByMobile(cleanMobile) : null;
+        const existingProfile = resolveAccount(cleanMobile);
         if (existingProfile && existingProfile.passwordHash) {
+          if (verifyPassword(password, existingProfile.passwordHash)) {
+            const user = {
+              name: existingProfile.name || (name && name.trim()) || `Customer (${cleanMobile.slice(-4)})`,
+              mobile: cleanMobile,
+              email: existingProfile.email || `${cleanMobile}@customer.shivjuice.com`,
+              loginType: 'password',
+              hasPassword: true,
+              loginTime: new Date().toISOString()
+            };
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({
+              success: true,
+              message: 'Signed in successfully!',
+              user: user
+            }));
+          }
+
           res.writeHead(409, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({
             success: false,
@@ -676,6 +716,9 @@ const requestHandler = (req, res) => {
         if (name && name.trim()) {
           updatedProfile.name = name.trim();
         }
+
+        // Cache in runtime memory immediately
+        global.__RUNTIME_ACCOUNTS[cleanMobile] = updatedProfile;
 
         if (orderSummaryService) {
           const resSave = orderSummaryService.saveProfile(updatedProfile);
