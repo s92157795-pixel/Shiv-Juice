@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "index.js": {
+      "includeFiles": "{frames/**,js/**,*.jpg,*.css,*.html}"
+    }
+  }
+}
