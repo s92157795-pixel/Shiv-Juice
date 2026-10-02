@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Shiv Juice Center Website",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dev-server.js"
+    "start": "node scripts/dev-server.js"
   },
   "keywords": [],
   "author": "",

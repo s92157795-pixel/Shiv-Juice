@@ -1,11 +1,11 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const apiHandler = require('./api/index');
-const orderSummaryService = require('./lib/order-summary-service');
+const apiHandler = require('../api/index');
+const orderSummaryService = require('../lib/order-summary-service');
 
 const PORT = process.env.PORT || 3000;
-const PUBLIC_DIR = __dirname;
+const PUBLIC_DIR = path.join(__dirname, '..');
 const FALLBACK_FRAMES_DIR = 'c:/Users/shiv/Downloads/ezgif-5175a26bed708a9b-jpg';
 const SHOP_LOCATION = 'Shiv Juice Center, Sonia Vihar 3rd Pusta, Delhi - 110094';
 
