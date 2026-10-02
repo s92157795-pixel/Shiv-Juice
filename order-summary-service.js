@@ -1,7 +1,18 @@
 const fs = require('fs');
 const path = require('path');
-const XLSX = require('xlsx');
-const nodemailer = require('nodemailer');
+let XLSX = null;
+try {
+  XLSX = require('xlsx');
+} catch (e) {
+  console.warn('[WARN] xlsx module not available in this environment:', e.message);
+}
+
+let nodemailer = null;
+try {
+  nodemailer = require('nodemailer');
+} catch (e) {
+  console.warn('[WARN] nodemailer module not available in this environment:', e.message);
+}
 
 const isVercel = !!process.env.VERCEL;
 
@@ -228,21 +239,23 @@ function updateOrderSummarySheets(allOrders) {
       { wch: 32 }  // Shipping Method
     ];
 
-    XLSX.utils.book_append_sheet(wb, ws, 'My WooCommerce Store Orders');
+    if (XLSX) {
+      XLSX.utils.book_append_sheet(wb, ws, 'My WooCommerce Store Orders');
 
-    // 2. Save .xlsx and .csv in target folder
-    const targetXlsx = path.join(ODER_SUMMARY_DIR, 'Store_Orders_Summary.xlsx');
-    const targetCsv = path.join(ODER_SUMMARY_DIR, 'Store_Orders_Summary.csv');
+      // 2. Save .xlsx and .csv in target folder
+      const targetXlsx = path.join(ODER_SUMMARY_DIR, 'Store_Orders_Summary.xlsx');
+      const targetCsv = path.join(ODER_SUMMARY_DIR, 'Store_Orders_Summary.csv');
 
-    XLSX.writeFile(wb, targetXlsx);
-    const csvContent = XLSX.utils.sheet_to_csv(ws);
-    fs.writeFileSync(targetCsv, csvContent, 'utf8');
+      XLSX.writeFile(wb, targetXlsx);
+      const csvContent = XLSX.utils.sheet_to_csv(ws);
+      fs.writeFileSync(targetCsv, csvContent, 'utf8');
 
-    // Also backup in local website folder
-    const localXlsx = path.join(LOCAL_SUMMARY_DIR, 'Store_Orders_Summary.xlsx');
-    const localCsv = path.join(LOCAL_SUMMARY_DIR, 'Store_Orders_Summary.csv');
-    XLSX.writeFile(wb, localXlsx);
-    fs.writeFileSync(localCsv, csvContent, 'utf8');
+      // Also backup in local website folder
+      const localXlsx = path.join(LOCAL_SUMMARY_DIR, 'Store_Orders_Summary.xlsx');
+      const localCsv = path.join(LOCAL_SUMMARY_DIR, 'Store_Orders_Summary.csv');
+      XLSX.writeFile(wb, localXlsx);
+      fs.writeFileSync(localCsv, csvContent, 'utf8');
+    }
 
     console.log(`[ORDER SUMMARY UPDATED] Successfully synced ${allOrders.length} orders to:`);
     console.log(` -> ${targetXlsx}`);
@@ -382,7 +395,7 @@ async function sendBatchEmailNotification(batchOrders) {
   const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
   const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
 
-  if (smtpUser && smtpPass) {
+  if (smtpUser && smtpPass && nodemailer) {
     try {
       const transporter = nodemailer.createTransport({
         service: process.env.SMTP_SERVICE || (smtpUser.includes('@gmail.com') ? 'gmail' : undefined),

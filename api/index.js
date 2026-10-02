@@ -34,8 +34,19 @@ function loadEnv() {
 }
 loadEnv();
 
-const orderSummaryService = require('../order-summary-service');
-const Razorpay = require('razorpay');
+let orderSummaryService = null;
+try {
+  orderSummaryService = require('../order-summary-service');
+} catch (e) {
+  console.warn('[WARN] orderSummaryService could not be loaded:', e.message);
+}
+
+let Razorpay = null;
+try {
+  Razorpay = require('razorpay');
+} catch (e) {
+  console.warn('[WARN] razorpay module could not be loaded:', e.message);
+}
 
 // Payment Gateway & UPI Configuration
 const PUBLIC_UPI_ID = process.env.PUBLIC_UPI_ID || '8799779715@ptaxis';
@@ -262,6 +273,19 @@ const requestHandler = (req, res) => {
 
   const rawUrl = (req.headers && (req.headers['x-matched-path'] || req.headers['x-forwarded-uri'])) || req.url || '/';
   let reqPath = decodeURI(rawUrl.split('?')[0]);
+  // Diagnostic Status Check
+  if (reqPath === '/api/debug' || reqPath === '/api/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      status: 'ok',
+      time: new Date().toISOString(),
+      node: process.version,
+      isVercel: !!process.env.VERCEL,
+      hasOrderSummaryService: !!orderSummaryService,
+      hasRazorpay: !!Razorpay
+    }));
+    return;
+  }
 
   // ==========================================
   // FAST2SMS OTP API: Send OTP
