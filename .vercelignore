@@ -1,0 +1,11 @@
+# Ignore local server so Vercel treats the root site as 100% static CDN assets
+server.js
+
+# Ignore local logs and summaries
+*.log
+Store_Orders_Summary.xlsx
+Store_Orders_Summary.csv
+orders.json
+orders.csv
+profiles.json
+notification_batch.json
